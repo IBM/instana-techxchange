@@ -1,0 +1,71 @@
+---
+title: Quiz Time!
+description: Quiz
+sidebar_label: Quiz
+sidebar_position: 5
+---
+
+import MultiChoiceQuestion from "../../../_common/components/multi-choice.jsx"
+
+<div
+  style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  }}>
+
+<MultiChoiceQuestion
+  questionNumber="1"
+  question="Kubernetes and Cloud Foundry are the only supported Platforms Instana can monitor?"
+  answers={["True", "False"]}
+  correctAnswer="False"
+/>
+
+<MultiChoiceQuestion
+  questionNumber="2"
+  question="What happens when you do not specify a Zone Name for an Agent?"
+  answers={[
+    "The agent will not show in the Infrastructure view.",
+    "The agent will be in an error state until a Zone Name is added.",
+    "The Agents host will be placed into a zone called 'Undefined Zone'.",
+    "The host will not be assigned to any Zone.",
+  ]}
+  correctAnswer="The Agents host will be placed into a zone called 'Undefined Zone'."
+/>
+
+<MultiChoiceQuestion
+  questionNumber="3"
+  question="What Dynamic Focus Query would you use to filter out a host with the name 'instana'?"
+  answers={[
+    "entity.hostName:instana",
+    "entity.host.hostname:instana",
+    "entity.host.name:instana",
+    "entity.hostname.name:instana",
+  ]}
+  correctAnswer="entity.host.name:instana"
+/>
+
+<MultiChoiceQuestion
+  questionNumber="4"
+  question="What is the quickest way to manually find a host with high CPU utilisation?"
+  answers={[
+    "Click through each host in the Infrastructure map and view the CPU chart.",
+    "This cannot be done manually, you must create a dashboard.",
+    "Use the 'Comparison Table' view to list all hosts and sort by CPU Usage.",
+  ]}
+  correctAnswer="Use the 'Comparison Table' view to list all hosts and sort by CPU Usage."
+/>
+
+<MultiChoiceQuestion
+  questionNumber="5"
+  question="Which of the following is the most accurate description of an Application Perspective?"
+  answers={[
+    "A group of services that are related to each other and are part of the same application.",
+    "A group of services that are related to each other and are part of the same application and are running on the same host.",
+    "A group of services and endpoints that are combined into a dashboard to show the health and performance of an application.",
+    "A group of services and endpoints running on the same host that are combined into a dashboard to show the health and performance of an application.",
+  ]}
+  correctAnswer="A group of services and endpoints that are combined into a dashboard to show the health and performance of an application."
+/>
+
+</div>
