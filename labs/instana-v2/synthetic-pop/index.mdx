@@ -1,36 +1,23 @@
 ---
-title: 3. Synthetic Monitoring
+title: Synthetic Monitoring
 description: Welcome to the Synthetic Monitoring lab
-sidebar_position: 3
+sidebar_position: 50
 ---
 
 # Synthetic Monitoring
 
 In this Lab exercise we will create synthetic tests to check services availability with Instana and notify responsible contacts. First, we will install Synthetic Point of Presence component and enable it in Instana backend. In the second exercise we will create token in Instana backend to interogate Instana via REST. The third exercise will guide us to create a test of two probes. As example we will monitor number of managed objects. Final exercise is about creating Smart Alert to notify responsible teams.
 
-## Install Synthetic Point of Presence component
+## 1. Install Synthetic Point of Presence component
 
-Access to bastion node.
-
-:::tip
-
-If you are unsure how to get access to the Bastion host (Guacamole) see
-[Accessing a Lab Environment](/waiops-tech-jam/labs/jam-in-a-box/#accessing-a-lab-environment)
-
-:::
-
-From the Bastion host (Guacamole), open a terminal window by selecting
-**Activities** at the top left of the screen and then the terminal icon.
-
-![open-terminal](images/open-terminal.png)
-
+1.1 Access to bastion node.
 Navigate to "instana-core" namespace and edit core component of Instana backend cluster by commands:
 ```bash
 oc project instana-core
 oc edit core
 ```
 
-add the following 5 feature flags in spec -> featureFlags section to enable Synthetics features:
+1.2 Add the following 5 feature flags in spec -> featureFlags section to enable Synthetics features:
 ```yaml
 spec:
   featureFlags:
@@ -48,7 +35,7 @@ spec:
 Pay attention to indentation.
 Save and exit. 
 
-Ensure synthetic pods have started sucessfully:
+1.3 Ensure synthetic pods have started sucessfully:
 ```text
 [root@localhost ~]# oc get pods | grep synthetic
 synthetics-acceptor-558ff84bbb-g2wxq           1/1     Running   0          5m
@@ -58,12 +45,12 @@ synthetics-writer-579d5cf458-7tx7q             1/1     Running   0          5m
 [root@localhost ~]# 
 ```
 
-If Helm wasn't installed on previous labs, install it on bastion node now using:
+1.4 If Helm wasn't installed on previous labs, install it on bastion node now using:
 ```bash
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ```
 
-Click on "Synthetic Monitoring" and then on "Deploy a PoP" button:
+1.5 Click on "Synthetic Monitoring" and then on "Deploy a PoP" button:
 ![](images/DeployAPoP.png)
 
 Use "Simple" tab for Helm command. For Synthetic Point of Presence we need to provide certain parameters, for example:
@@ -87,7 +74,7 @@ Where:
 * controller.instanaSyntheticEndpoint - address of a Synthetic acceptor on Instana backend server, that we configured previously.
 * redis.password - redis password that will be established by Synthetic Point of Presence upon redis deployment.
 
-Adjust values:
+Specify values:
 - controller.location
 - controller.clusterName
 - redis.password
@@ -114,16 +101,16 @@ STATUS: deployed
 ```
 
 
-After the Synthetic point of presence is installed verify its appearence in the interface:
+1.6 After the Synthetic point of presence is installed verify its appearence in the interface:
 
 ![](images/PointOfPresence_Location.png)
 
-## Using script for REST API check
+## 2. Using script for REST API check
 In the exercise we will follow creating a test of series of probes and as example will monitor number of managed objects. 
 
 We will interrogate Instana backend as an example of external application.
 
-### Creating personal API token
+### 2.1. Creating personal API token
 
 As soon as we will check availability of Instana backend, we need a token to request data from backend. Token is a part of authentication and authorization mechanism, that allows access to certain kinds of data. Requests we are planing to place during the lab do not require special rights, we will create a basic token.
 
@@ -140,26 +127,26 @@ There are no extra permissions needed for the lab, basic set is enough.
 Click "Save" at the bottom of the page. 
 
 
-### Creating REST API test
+### 2.2. Creating REST API test
 
 Synthetic scripts may include several calls and different types GET/POST/PUT/DELETE in the same test. During the lab we will be doing two GET requests:
 - Checking if Instana backend as a target application returns positive code (200)
 - Checking the number of currently reporting agents is less than threshold
 
-Right click on "Synthetic Monitoring" and open it in a new browser tab:
+2.2.1 Right click on "Synthetic Monitoring" and open it in a new browser tab:
 ![](images/SyntheticsInANewTab.png)
 
-To create synthetic test switch to just created browser tab with "Synthetic Monitoring" and click "+ ADD" button on the right bottom corner:
+2.2.2 To create synthetic test switch to just created browser tab with "Synthetic Monitoring" and click "+ ADD" button on the right bottom corner:
 
 ![](images/AddSynthetic.png)
 
-Choose "Add Synthetic Test"
+2.2.3 Choose "Add Synthetic Test"
 
 Select "Script API" and click "Next" button:
 ![](images/SyntheticScript.png)
 
 
-1. Paste the script into a field as shown below:
+2.2.4 Paste the script into a field as shown below:
 ```javascript
 var assert=require('assert');
 
@@ -209,43 +196,43 @@ As follows:
 
 ![](images/CreateSyntheticTest.png)
 
-2. For the test we need Instana token, created on previous step. 
+2.2.5 For the test we need Instana token, created on previous step. 
    - Switch to previous browser tab with Tokens: ![](images/TokenEye.png)
    - Click on eye on the right from the token and copy text.
    - Switch back to browser tab with script
    - Paste Token as value for TOKEN variable (line 9 on screenshot above)
    - Correct address for Target system (in our case it is Instana backend, so we named the variable appropriately: INSTANA_ADDR, line 5 on screenshot above)
 
-3. Instana will run the script from previously installed Synthetic Point of Presence, they can be placed at multiple places across available infrastructure. The one we will use is deployed on the same cluster with Instana, it may have different name. Select it for our test.
+2.2.6 Instana will run the script from previously installed Synthetic Point of Presence, they can be placed at multiple places across available infrastructure. The one we will use is deployed on the same cluster with Instana, it may have different name. Select it for our test.
    
-4. Click Next
+Click Next
 
 
-Adjust time slider to run test every minute:
+2.2.7 Adjust time slider to run test every minute:
 ![](images/TimeSlider.png)
 
 and click "Next" button.
 
 
-Give the test meaningful name and description:
+2.2.8 Give the test meaningful name and description:
 ![](images/CreateSynthTest.png)
 
 At the dialog under "Select an Application" you may specify the list of existing applications for which the test is relevant. The result of the test will appear at the "Synthetic Monitoring" tab of the Application dashboard and you will be able to filter tests by application on Synthetic Monitoring dashboard.
 
 Click "Create" button.
 
-It may take up to minute for Instana to perform the first test and show the line with results. You can refresh browser window and changing time duration for the dashboard on right top of the window to speed up the line to appear before the results of first test will be processed.
+2.2.9 It may take up to minute for Instana to perform the first test and show the line with results. You can refresh browser window and changing time duration for the dashboard on right top of the window to speed up the line to appear before the results of first test will be processed.
 
 By now you should see a list of tests:
 ![](images/ListOfTests.png)
 
-Click on the test name to access the dashboard of the synthetic test:
+2.2.10 Click on the test name to access the dashboard of the synthetic test:
 
 ![](images/SyntheticTestDashboard.png)
 
 At the moment we have 1 agent reporting to the backend, so the assert of the last check has been passed. We will adjust threshold of the assert to 1 so we can trigger the synthetic test to fail.
 
-Repeat the creation step for additional "Failing test" with the script adjusted as `assert.ok(bodyObj.hostCount < 1,` at the last request instead of `< 2` as below:
+2.2.11 Repeat the creation step 2.2 for additional "Failing test" with the script adjusted as `assert.ok(bodyObj.hostCount < 1,` at the last request instead of `< 2` as below:
 
 ```javascript
 ...
@@ -259,11 +246,11 @@ In the case the result will indicate that the parameter is out of the desired am
 
 ![](images/FailingTest.png)
 
-## Create smart Alert for test
+## 3. Create smart Alert for test
 
 Smart Alerts allow to escalate determined violation to umbrella monitoring systems like Watson AIOps or Email, Slack, Service Now, etc. in Instana it is called channel. 
 
-Click "Synthetic Monitoring" -> "Smart Alerts" -> "ADD SYNTHETIC SMART ALERT":
+3.1 Click "Synthetic Monitoring" -> "Smart Alerts" -> "ADD SYNTHETIC SMART ALERT":
 ![](images/AddSmartAlert.png)
 
 Click "Add Synthetic Test" -> checkmark the failing test -> hit button "Add 1 Test"
@@ -272,15 +259,15 @@ Click "Add Synthetic Test" -> checkmark the failing test -> hit button "Add 1 Te
 
 Click "Next"
 
-On step 2 you may add filter for monitored objects, click "Next"
+3.2 You may add filter for monitored objects, click "Next"
 
 ![](images/SA_Step2.png)
 
-On step 3 we choose 1 consecutive occurrence to fire an alert, click Next:
+3.3 We choose 1 consecutive occurrence to fire an alert, click Next:
 
 ![](images/SA_Step3.png)
 
-On step 4 select "Select Alert Channels", "Create Alert Channel" to create new channel, then populate name of the channel and the list of email addresses (we will not send emails to real addresses, so just populate the field with any email address):
+3.4 Select "Select Alert Channels", "Create Alert Channel" to create new channel, then populate name of the channel and the list of email addresses (we will not send emails to real addresses, so just populate the field with any email address):
 ![](images/SA_Step4_CreateChannel.png)
 
 and click "Create Alert Channel", click "Cancel" to finish channel creation procedure.
@@ -293,7 +280,7 @@ And click "Next":
 
 ![](images/SA_Step4_AlertChannels.png)
 
-On step 5 configure the alert that will be visible when the threshold violated. Set meaningful values for Title, Alert Level and Description, then click "Create" button:
+3.5 Configure the alert that will be visible when the threshold violated. Set meaningful values for Title, Alert Level and Description, then click "Create" button:
 
 ![](images/SA_Step5.png)
 
