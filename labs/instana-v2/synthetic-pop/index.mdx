@@ -6,7 +6,7 @@ sidebar_position: 50
 
 # Synthetic Monitoring
 
-In this Lab exercise we will create synthetic tests to check services availability with Instana and notify responsible contacts. First, we will install Synthetic Point of Presence component and enable it in Instana backend. In the second exercise we will create token in Instana backend to interogate Instana via REST. The third exercise will guide us to create a test of two probes. As example we will monitor number of managed objects. Final exercise is about creating Smart Alert to notify responsible teams.
+In this Lab exercise we will create synthetic tests to check services availability with Instana and notify responsible contacts. First, we will install Synthetic Point of Presence component and enable it in Instana backend. In the second exercise we will create token in Instana backend to interogate Instana via REST. The third exercise will guide us to create a test of two probes. As example we will monitor number of managed objects. Next exercise is about creating Smart Alert to notify responsible teams. On final step we will create an Action script, associate it with event and execite it from the Event context.
 
 ## 1. Install Synthetic Point of Presence component
 
@@ -17,7 +17,7 @@ oc project instana-core
 oc edit core
 ```
 
-1.2 Add the following 5 feature flags in spec -> featureFlags section to enable Synthetics features:
+1.2 Add the following 5 feature flags into the existing spec -> featureFlags section to enable Synthetics features:
 ```yaml
 spec:
   featureFlags:
@@ -45,7 +45,7 @@ synthetics-writer-579d5cf458-7tx7q             1/1     Running   0          5m
 [root@localhost ~]# 
 ```
 
-1.4 If Helm wasn't installed on previous labs, install it on bastion node now using:
+1.4 If Helm wasn't installed during previous labs, install it on bastion node now with command:
 ```bash
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ```
@@ -53,51 +53,46 @@ curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 1.5 Click on "Synthetic Monitoring" and then on "Deploy a PoP" button:
 ![](images/DeployAPoP.png)
 
-Use "Simple" tab for Helm command. For Synthetic Point of Presence we need to provide certain parameters, for example:
-```bash
-helm install synthetic-pop \
-    --repo https://agents.instana.io/helm  \
-    --namespace instana-synthetic \
-    --create-namespace \
-    --set downloadKey="***" \
-    --set controller.location="Local;on Instana cluster;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
-    --set controller.instanaKey="***" \
-    --set controller.clusterName="MyInstanaCluster" \
-    --set controller.instanaSyntheticEndpoint="https://instana.apps.***.ibm.com/synthetics" \
-    --set redis.tls.enabled=false \
-    --set redis.password="a1fc5d01bcbb" \
-    synthetic-pop
-```
+Use "Simple" tab for Helm command. For Synthetic Point of Presence we need to provide certain parameters. 
 
-Where:
-* controller.location - includes Name; Display name; Country; City; Latitude; Longitude; Description. This information is used to differentiate this Synthetic Point of Presence from others.
-* controller.instanaSyntheticEndpoint - address of a Synthetic acceptor on Instana backend server, that we configured previously.
-* redis.password - redis password that will be established by Synthetic Point of Presence upon redis deployment.
+***Add `--set seccompDefault=true \`*** as in example below:
 
-Specify values:
+![](images/synthetic-command-helm.png)
+As soon as the version of OCP in the lab higher than 4.11 then it is necessary to set parameter `--set seccompDefault=true`, otherwise controller pod container will not be able to run after creation.
+
+In the example above there are following flags:
+* **controller.location** - includes Name; Display name; Country; City; Latitude; Longitude; Description. This information is used to differentiate this Synthetic Point of Presence from others.
+* **controller.instanaSyntheticEndpoint** - address of a Synthetic acceptor on Instana backend server, that we configured previously.
+* **redis.password** - redis password that will be established by Synthetic Point of Presence upon redis deployment.
+* **seccompDefault** - required parameter with value `true` when Synthetic Point of Presence is being installed on OCP >= v4.11
+
+Copy helm command to any text editor and specify values:
 - controller.location
 - controller.clusterName
 - redis.password
-and Install Synthetic Point of Presence using the command :
+- seccompDefault
+
+and Install Synthetic Point of Presence using the command similar to:
 
 ```text
-[root@localhost ~]# helm install synthetic-pop \
+[sysadmin@bastion ~]$ helm install synthetic-pop \
 >     --repo https://agents.instana.io/helm  \
 >     --namespace instana-synthetic \
 >     --create-namespace \
->     --set downloadKey="***" \
+>     --set downloadKey="<YOUR_DOWNLOAD_KEY>" \
 >     --set controller.location="Local;on Instana cluster;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
->     --set controller.instanaKey="***" \
+>     --set controller.instanaKey="<YOUR_DOWNLOAD_KEY>" \
 >     --set controller.clusterName="MyInstanaCluster" \
->     --set controller.instanaSyntheticEndpoint="https://instana.apps.***.ibm.com/synthetics" \
+>     --set controller.instanaSyntheticEndpoint="https://apps.ocp.ibm.edu/synthetics" \
 >     --set redis.tls.enabled=false \
 >     --set redis.password="a1fc5d01bcbb" \
+>     --set seccompDefault=true \
 >     synthetic-pop
 NAME: synthetic-pop
 LAST DEPLOYED: Thu Jul 13 07:49:37 2023
 NAMESPACE: instana-synthetic
 STATUS: deployed
-[root@localhost ~]#
+[sysadmin@bastion ~]$
 ```
 
 
@@ -112,7 +107,7 @@ We will interrogate Instana backend as an example of external application.
 
 ### 2.1. Creating personal API token
 
-As soon as we will check availability of Instana backend, we need a token to request data from backend. Token is a part of authentication and authorization mechanism, that allows access to certain kinds of data. Requests we are planing to place during the lab do not require special rights, we will create a basic token.
+As soon as we will check availability of Instana backend, we need a token to request data from backend. Token is a part of authentication and authorization mechanism, that allows access to certain kinds of data. We will create a basic token at requests we are planing to place during the lab do not require special rights.
 
 Create token by selecting "Settings" -> "Team Settings" -> "API Token" -> "Add API Token":
 
@@ -143,15 +138,22 @@ Synthetic scripts may include several calls and different types GET/POST/PUT/DEL
 2.2.3 Choose "Add Synthetic Test"
 
 Select "Script API" and click "Next" button:
+
 ![](images/SyntheticScript.png)
 
+:::note
+
+Use text editor to paste the code into lab environment and than copy from that text editor to the field to avoid errors in the code while pasting directly to the lab environment and the field at once.
+To open text editor: click Activities on the left top corner -> Select 9 dots (Show Applications) -> Choose "Text Editor".
+
+:::
 
 2.2.4 Paste the script into a field as shown below:
 ```javascript
 var assert=require('assert');
 
 // Address that Synthetic PoP will use to access target host to interrogate:
-var INSTANA_ADDR = 'https://unit0-tenant0.instana.apps.XXXXXXXX.ibm.com';
+var INSTANA_ADDR = 'https://dev-aiops.apps.ocp.ibm.edu';
 
 // Target system token that allows to serve the request (As soon as we
 // interrogate Instana backend, it is Instana token):
@@ -171,6 +173,7 @@ var options = {
 
 // Send request and check if the response code is 200
 $http.get(options, function(error, response, body) {
+    var bodyObj = JSON.parse(body);
     assert.ok(response.statusCode==200, "GET status should be 200. Instead it's " + response.statusCode);
 });
 
@@ -188,22 +191,21 @@ var options = {
 
 $http.get(options, function(error, response, body) {
     var bodyObj = JSON.parse(body);
-    assert.ok(bodyObj.hostCount < 2, "We bought license to monitor 2 hosts and we have reached " + bodyObj.hostCount + " already!");
+    assert.ok(bodyObj.hostCount < 3, "We have license to monitor 2 hosts and we have reached " + bodyObj.hostCount + " already!");
 });
 ```
 
 As follows:
 
-![](images/CreateSyntheticTest.png)
+![](images/Create_Synthetic_Test.png)
 
 2.2.5 For the test we need Instana token, created on previous step. 
    - Switch to previous browser tab with Tokens: ![](images/TokenEye.png)
    - Click on eye on the right from the token and copy text.
    - Switch back to browser tab with script
    - Paste Token as value for TOKEN variable (line 9 on screenshot above)
-   - Correct address for Target system (in our case it is Instana backend, so we named the variable appropriately: INSTANA_ADDR, line 5 on screenshot above)
 
-2.2.6 Instana will run the script from previously installed Synthetic Point of Presence, they can be placed at multiple places across available infrastructure. The one we will use is deployed on the same cluster with Instana, it may have different name. Select it for our test.
+2.2.6 Instana will run the script from previously installed Synthetic Point of Presence, they can be placed at multiple locations across available infrastructure. The one we will use is deployed on the same cluster with Instana, it may have different name. Select it for our test.
    
 Click Next
 
@@ -230,9 +232,9 @@ By now you should see a list of tests:
 
 ![](images/SyntheticTestDashboard.png)
 
-At the moment we have 1 agent reporting to the backend, so the assert of the last check has been passed. We will adjust threshold of the assert to 1 so we can trigger the synthetic test to fail.
+At the moment we have 2 agents reporting to the backend, so the assert of the last check has been passed. We will adjust threshold of the assert to 1 so we can trigger the synthetic test to fail.
 
-2.2.11 Repeat the creation step 2.2 for additional "Failing test" with the script adjusted as `assert.ok(bodyObj.hostCount < 1,` at the last request instead of `< 2` as below:
+2.2.11 Repeat the creation step 2.2 for additional "Failing test" with the script adjusted as `assert.ok(bodyObj.hostCount < 1,` at the last request instead of `< 4` as below:
 
 ```javascript
 ...
@@ -241,6 +243,8 @@ $http.get(options, function(error, response, body) {
     assert.ok(bodyObj.hostCount < 1, "We bought license to monitor 2 hosts and we have reached " + bodyObj.hostCount + " already!");
 });
 ```
+
+Or click "Configuration" tab of a test and edit script to change hostCount condition. 
 
 In the case the result will indicate that the parameter is out of the desired amount (monitored systems number threshold has been reached):
 
@@ -292,6 +296,72 @@ Check Events appeared:
 
 ![](images/Events.png)
 
+## 4. Create Actions
+
+Actions in Instana allow to execute corrective commands in the same operating system with Instana agent. The approach allows to reduce downtime by fixing known issues right from the interface of Instana. 
+For example, when the log file of an application consumed all available disk space SREs may restore service by deleteing logs or extending space with one click from Instana dashboard.
+In the lab we will create an action that SRE can run from the context of a raised event.
+
+4.1 Click on Automation from the left menu, select "Action catalog" and then "New Action"
+![](images/ActionCatalog_new.png)
+
+Define Name and Description:
+![](images/ActionCatalog_ActionDetails.png)
+
+Select "Script" and populate command to execute:
+![](images/ActionCatalog_ActionConfiguration.png)
+
+```bash
+#!/bin/bash
+echo `date` " - Deleting old log files" >> /tmp/action.txt
+```
+
+4.2 At "4. Associate Events" section click on "Select Events" and choose "Erroneous call rate too high" events to associate with the action:
+![](images/ActionCatalog_AssociateEvents.png)
+Scroll down and click "Add 3 Events", 
+Scroll down and click "Create"
+
+4.3 Now we need to allow "Actions" on agents by enabling plugin in `configuration.yaml` of the agent.
+Login to Infranfs node using ssh terminal as root.
+Edit configuration.yaml of the agent:
+```bash
+vi /opt/instana/agent/etc/instana/configuration.yaml
+```
+
+Enable Actions plugin by adding the following config block in the end of the file:
+```yml
+# Action Catalog
+com.instana.plugin.action:
+  enable: true    # by default is false
+com.instana.plugin.action.script:
+  enable: true    # by default is false
+  scriptExecutionHome: /tmp
+  runAs: mqm
+```
+
+Save end exit from file.
+
+4.4 Get back to Instana dashboard and open Events -> Issues:
+Choose issue "Erroneous call rate too high":
+![](images/ActionCatalog_Event.png)
+
+Scroll down, see associated actions with the event and click "Run" on the Associated Action "Delete old log files":
+![](images/ActionCatalog_RunAction.png)
+
+Select Agent on which to run the command and click "Run Action":
+![](images/ActionCatalog_SelectAgent.png)
+
+4.4 To ensure the script has been executed login to Infranfs node using ssh terminal as root.
+
+Check content of a file `/tmp/action.txt` on infranfs:
+
+```bash
+cat /tmp/action.txt
+```
+
+Check that the script has been executed successfully:
+![](images/ActionCatalog_Results.png)
+
 
 ## Summary
 
@@ -299,3 +369,4 @@ During the lab we:
 - Configured target monitored system (created Token to request parameters)
 - Created Synthetic test with script to call REST endpoint
 - Created Smart Alert for the test
+- Created Action and run it from the context of Event
