@@ -1,12 +1,12 @@
 ---
-title: 4. OpenTelemetry instrumentation
+title: 2. OpenTelemetry instrumentation
 description: Instrument demo application with OpenTelemetry
 sidebar_position: 5
 ---
 
 # OpenTelemetry instrumentation
-For the purpose of this lab, we will use Instana OpenTelemetry Demo Application https://github.com/instana/opentelemetry-demo/tree/main 
-which is the fork of generic OpenTelemetry Demo Application available here https://github.com/open-telemetry/opentelemetry-demo.
+For the purpose of this lab, we will use [Instana OpenTelemetry Demo Application](https://github.com/instana/opentelemetry-demo/tree/main)
+which is the fork of generic [OpenTelemetry Demo Application](https://github.com/open-telemetry/opentelemetry-demo).
 
 Instana's custom fork of the OpenTelemetry Demo Application is a microservice-based application, integrated with an Instana backend. 
 The demo shows the native Instana OpenTelemetry data collection, correlation of OpenTelemetry tracing and the underlying monitored infrastructure, 
@@ -21,16 +21,10 @@ OpenTelemetry is included into Instana license, there's no additional payment re
 
 ## Enable OpenTelemetry in Instana
 
-First, let's make sure you are using the correct project in your OCP cluster
+Let's edit the configmap of instana-agent. We need to let instana-agent know which OpenTelemetry settings are required
 
 ```sh
-oc project instana-agent
-```
-
-Now, let's edit the configmap of instana-agent. We need to let instana-agent know which OpenTelemetry settings are required
-
-```sh
-oc edit configmap --namespace instana-agent 
+kubectl edit configmap --namespace instana-agent 
 ```
 
 Remove all commented lines from the configuration section as described below.
@@ -96,7 +90,7 @@ Save the file by typing ":wq"
 Restart all of the instana agents pods to ensure that configmap change was implemented.
 
 ```sh
-oc rollout restart daemonset instana-agent --namespace instana-agent 
+kubectl rollout restart daemonset instana-agent --namespace instana-agent 
 ```
 
 Restart will prompt with a message
@@ -140,22 +134,7 @@ deployment.apps/my-otel-demo-shippingservice restarted
 Once the instana-agent and OpenTelemetry Demo Application were restarted, it is now time to Verify
 if the applications works and delivers metrics as expected.
 
-Let's find out what is the OpenTelemetry Demo Application route by using below command 
-
-```sh
-oc project otel-demo
-oc get routes
-```
-
-The results will be similar to the below output
-
-```sh
-NAME           HOST/PORT                                            PATH   SERVICES                     PORT          TERMINATION   WILDCARD
-my-otel-demo   my-otel-demo-otel-demo.xxxxxxx.ibm.com          my-otel-demo-frontendproxy   tcp-service   edge          None
-
-```
-
-Your instance of OpenTelemetry Demo Application is available under the https://my-otel-demo-otel-demo.xxxxxxx.ibm.com. 
+Your instance of OpenTelemetry Demo Application is available under the https://otel-demo.ocp.ibm.edu/
 Let's use a browser to open that page. Please note the https in the address bar. 
 Also, do not worry about the security message - accept the self-signed certificate.
 
@@ -188,5 +167,5 @@ the captured traffic.
 
 ![appperspective3](images/otel-instrumentation-006-fixed.png)
 
-This view concludes chapter 4. You are now able to see the traffic from your instance of the OpenTelemetry Demo Application captured by Instana. 
+This view concludes this chapter. You are now able to see the traffic from your instance of the OpenTelemetry Demo Application captured by Instana. 
 Let's move to the next sections.

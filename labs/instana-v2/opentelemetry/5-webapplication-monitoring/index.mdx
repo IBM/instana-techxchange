@@ -1,5 +1,5 @@
 ---
-title: 5. Web-application monitoring
+title: 3. Web-application monitoring
 description: Configure Instana to monitor web-application
 sidebar_position: 6
 ---
@@ -14,8 +14,8 @@ Log in to your Instana UI, click on Web application and Add Website
 
 ![webapp1](images/webapp-001-fixed.png)
 
-Provide a name of your choice, click Next to get the screen with reportingURL and key. Please save these two values, 
-we will be using these later during the lab.
+Provide a name of your choice, click Next to get the screen with reportingURL and key. Please save the key value, 
+we will be using this later during the lab.
 
 ![webapp2](images/webapp-002-fixed.png)
 
@@ -26,15 +26,18 @@ Once the above step is ready, we can move to the next and edit the OpenTelemetry
 Go back to your terminal and apply the below commands
 
 ```sh
-oc project otel-demo 
-kubectl edit deploy my-otel-demo-frontend 
+kubectl edit deploy my-otel-demo-frontend -n otel-demo
 ```
 
-Find the string "EUM" (you can use "?EUM" command in your text editor)
+Find the string "EUM" (you can use ":/EUM" command in your text editor)
 
 ![webapp3](images/webapp-003.png)
 
-Apply the values as described on the below screen. Use your reportingURL and key from the previous step of this lab.
+Apply the values as described on the below: 
+
+INSTANA_EUM_URL: https://eum.apps.ocp.ibm.edu
+
+INSTANA_EUM_KEY: Use your key from the previous step of this lab.
 
 ![webapp4](images/webapp-004-fixed.png)
 
@@ -42,6 +45,6 @@ Save the file by entering ":wq"
 
 ## Generate traffic on the OpenTelemetry Demo Application
 
-As described in the chapter 4, please run some test traffic through your instance of the OpenTelemetry Demo Application. 
+As described in the chapter 2, please run test traffic through your instance of the OpenTelemetry Demo Application. 
 Thanks to this, Instana will capture the end-to-end traffic starting from the web activity, down to the services and databases level.
 
