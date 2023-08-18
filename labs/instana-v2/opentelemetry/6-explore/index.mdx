@@ -10,11 +10,12 @@ Now, once the Instana and OpenTelemetry Demo Application are in sync, you can st
 
 ## Instana native tracing
 
-In this section you will focus on exploring Instana's native tracing capabilities. In your Instana UI/Analytics search for calls which meet 
-these criteria: 
+In this section you will focus on exploring Instana's native tracing capabilities. Within the Instana UI, select Analytics (1).  Then, add two Filter criteria as shown below.
 
-- Application name: your application name
-- Service name: frontendproxy
+- Application name: your application name (2)
+- Service name: frontendproxy (3)
+
+You'll need to specify an "AND" condition between the two filter parameters.
 
 Click on the image call described under the point (4) from the below screen
 
@@ -28,40 +29,48 @@ This means that Instana injected its own tracing libraries into the proxy applic
 ## OpenTelemetry tracing
 
 Using Instana agent, you can also receive OpenTelemetry based traces. Let's find an example in your environment.
-Go to Instana UI/Analytics search for calls which meet these criteria: 
+Go to Instana UI/Analytics (1) and search for calls which meet these criteria: 
 
-- Application name: your application name
-- Service name: quoteservice
+- Application name: your application name (2)
+- Service name: quoteservice (3)
 
-Click on the call link to see the transaction details.
+Click on the call link (4) to see the transaction details.
 
 ![explore6](images/explore-006-fixed.png)
 
-In the detailed view of the call, please take a look at the right side of the screen. You will find there a list of json attributes captured by Instana. One of them is called 
+You can select different calls within the call stack and the context on the right will change.  
+
+Select the "POST /getquote" call and then look at the right side of the screen. You will find there a list of json attributes captured by Instana. One of them is called 
 "telemetry.sdk.name" with a value "opentelemetry", which proves that the content is coming from the OpenTelemetry tracer.
+
+Notice taht the trace context is quite different from the formatting when looking at a native Instana trace.
 
 ![explore7](images/explore-007-fixed.png)
 
 ## Instana and OpenTelemetry combined traces
 
-Instana can combine traces coming from applications instrumented by OpenTelemetry and Instana tracing on the same screen. 
-Please follow the below instructions to find an example of such transaction in your environment.
+One of the key capabilities within Instana is the ability to stitch together traces using Instana's proprietary tracing and OpenTelemetry traces into a single application trace.
+Without this unique capability, you would be "required" to instrument your entire application with OpenTelemetry.   This can be a significant challenge, 
+particularly when there are shared services.
+
+Please follow the below instructions to find an example of such a transaction in your environment.
 
 Go to Instana UI/Analytics and search for the calls that are in your application perspective and endpoint name is /api/cart like presented below.
 Click on /api/cart to see the details of the call.
 
 ![explore1](images/explore-003-fixed.png)
 
-Click on the first transaction as highlighted on the below screen in a point (1). The point (2) represents the captured data. 
-The content was delivered by a native Instana tracing.
+Click on the first call as highlighted on the below screen in a point (1). The point (2) represents the captured data. 
+The content was delivered by a native Instana tracing.  You can tell based on the formatting of the Tags.
 
 ![explore2](images/explore-001-fixed.png)
 
-Click on the second row within the transaction as described below in a point (1). The point (2) represents the captured data which comes from the OpenTelemetry tracer.
+Click on the second call within the call stack as described below in a point (1). The details on the right (2) represents the captured data which comes 
+from the OpenTelemetry tracer.
 
 ![explore3](images/explore-002-fixed.png)
 
-The above example proves the Instana can combine traces from both OpenTelemetry and Instana tracing within the same screen under one transaction ID.
+The above example shows how Instana can combine traces from both OpenTelemetry and Instana tracing and stitch them together into a single application transaction.
 
 ## Instana native tracing - code examples
 
@@ -160,3 +169,8 @@ return function (App $app) {
 Please note the use of OpenTelemetry/API and further use of the span builders.
 
 [The source code can be found here](https://github.com/instana/opentelemetry-demo/blob/main/src/quoteservice/app/routes.php)
+
+
+To summarize, you have seen how Intana can ue both proprietary tracing and OpenTelemetry to instrument application transactions. 
+And, it has the unique ability to combine those traces into a single application transaction that can be traced end-to-end. 
+This allows customers to gradually transition their applications and shared services over to OpenTelemetry without losing end-to-end visibility.
