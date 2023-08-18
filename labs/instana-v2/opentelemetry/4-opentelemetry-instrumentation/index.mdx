@@ -17,71 +17,53 @@ in the Instana agent.
 
 OpenTelemetry is an open-source observability framework with a collection of software development kits (SDKs), vendor-neutral or vendor-agnostic APIs, and tools for instrumentation. 
 This technology can generate, collect, export, and instrument telemetry data to analyze your platform's behavior and performance. Opentelemetry is also known as OTel. 
-OpenTelemetry is included into Instana license, there's no additional payment required.
+OpenTelemetry is included into Instana license, there's no additional payment required, but the monitored servers need to be licensed.
 
 ## Enable OpenTelemetry in Instana
 
-Let's edit the configmap of instana-agent. We need to let instana-agent know which OpenTelemetry settings are required
+Let's edit the configmap of instana-agent. We need to let instana-agent know which OpenTelemetry settings are required.
+
+Before editing the configmap, let's copy the content that needs to be added into your buffer.
+
+In the terminal window, type "ls instana*".  You will see a file named "instana-config-map.txt" as seen below.
+```sh
+ls instana*
+instana-config-map.txt"
+```
+
+Next, cat the file to view the content that needs to be added to the configmap.
+
+```sh
+cat instana-config-map.txt
+```
+
+![configmap](images/configMap.png)
+
+Highlight all of the text and then right-click and select "Copy" as shown below.
+
+![configmap](images/selectText.png)
+
+Next, edit the configmap by typing the command shown below.   Do NOT copy/paste this command or you will lose the configmap content from your buffer.
 
 ```sh
 kubectl edit configmap --namespace instana-agent 
 ```
 
-Remove all commented lines from the configuration section as described below.
+Within the configmap, move your mouse directly below the configuration.yaml line as seen below.
 
-You can use "dd" in the text editor to remove a single line from the file.
 
-![configmap](images/otel-instrumentation-001-fixed.png)
+![configmap](images/mouseLocation.png)
 
-Once the remove is done, copy and paste the below configuration content. 
+Then, type the letter "i" to change to "insert" mode.
 
-Please note that there are exact number of spaces required.
+Finally, right-click and select "Paste" to paste the additional text into the configmap.
 
-```yaml
-      com.instana.plugin.opentelemetry:
-        # enabled: false       # legacy setting, will only enable grpc, defaults to false
-        grpc:
-          enabled: true    # takes precedence over legacy settings above, defaults to true iff "grpc:" is present
-        http:
-          enabled: true     # allows to enable http endpoints, defaults to true iff "http:" is present
-      
-      com.instana.ignore:
-        arguments:
-          # - '-javaagent:/opt/otel/opentelemetry-javaagent-all.jar'
-          # - '-javaagent:/app/opentelemetry-javaagent.jar'
-          # - '-javaagent:/tmp/opentelemetry-javaagent.jar'
-      
-      com.instana.tracing:
-        extra-http-headers:
-          - traceparent
-          - tracestate
-      
-      com.instana.plugin.generic.hardware:
-        enabled: true
-      
-      # otel-demo configurations
-      com.instana.plugin.postgresql:
-        user: 'ffs'
-        password: 'ffs'
-        database: 'postgres'
-      
-      com.instana.plugin.javatrace:
-        instrumentation:
-          enabled: false
-        trace-jvms-with-problematic-agents: true
-      
-      com.instana.plugin.python:
-        autotrace:
-          enabled: false
-      
-      com.instana.plugin.php:
-        tracing:
-          enabled: false
-```
+![configmap](images/paste.png)
+
 
 The final structure of the configmap should look like the below example
 
-![configmap](images/otel-instrumentation-007.png)
+![configmap](images/cmResults.png)
 
 Save the file by typing ":wq" 
 
@@ -150,13 +132,27 @@ Switch to "Advanced mode"
 
 ![appperspective2](images/otel-instrumentation-003-fixed.png)
 
-Provide application name of your choice, your cluster name, select "All downstream services" and "All calls", click "Create"
+First, provide application name of your choice
+2nd, select the "Add filter" button.
+3rd, in the dialog, type the word "cluster" to filter the list.
+4th, select "Kubernetes -> Cluster Name" from the filtered list.
+ select your cluster name
 
-![appperspective2](images/otel-instrumentation-005-fixed.png)
+![appperspective2](images/defineApplication.png)
+
+* After selecting "Kubernetes -> Cluster Name", you will see a text box.   If you click on the box, it should provide a list of clusters.  You can either select your cluster name or you can type the name of the cluster.
+* Next, select the "All downstream services" radio button.
+* Select the "All Calls" radio button.
+* Finally, click the "Create" button to create the application perspective as seen below.
+
+![apperspective2](images/createApplication2.png)
+
+The Instana UI will automatically switch your context to the new "Application Perspetive".  Initially, there will not be any data in the new "Application Perspetive."
+
 
 ## Generate OpenTelemetry Demo Application traffic
 
-Once the demo application is up and running, let's generate some traffic. 
+Now that the "Application Perspective" has been defined and the demo application is back up and running, let's generate some traffic. 
 Go back to the OpenTelemetry Demo Application in the browser, click through the site and explore the page, 
 add products to the cart, make some orders.
 
