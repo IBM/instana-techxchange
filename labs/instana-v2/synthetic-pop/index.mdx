@@ -1,17 +1,42 @@
 ---
-title: Synthetic Monitoring
-description: Welcome to the Synthetic Monitoring lab
+title: Synthetic Monitoring and Action Catalog
+description: Welcome to the Synthetic Monitoring and Action Catalog lab
 sidebar_position: 50
 ---
 
-# Synthetic Monitoring
+# Synthetic Monitoring and Action Catalog
 
-In this Lab exercise we will create synthetic tests to check services availability with Instana and notify responsible contacts. First, we will install Synthetic Point of Presence component and enable it in Instana backend. In the second exercise we will create token in Instana backend to interogate Instana via REST. The third exercise will guide us to create a test of two probes. As example we will monitor number of managed objects. Next exercise is about creating Smart Alert to notify responsible teams. On final step we will create an Action script, associate it with event and execite it from the Event context.
+This lab focuses on two new Instana features.  The first is synthetic monitoring.  The second is the Action Catalog where you can create and execute automated corrective actions.
+Key capabilities that will be exercised are:
+- Setting up the synthetic "Point of Presence"  This is the component that executes the synthetic test.
+- Single REST API synthetic test
+- Using javascript to execute a scripted synthetic test that exercises multiple REST calls
+- Create and execute "Actions" via the Action Catalog
+
+Before we can create any synthetic tests, we must first setup a synthetic "Point of Presence" or "PoP server" to playback our synethetic tests.
+Many customers deploy two or more "Points of Presence" so that they can compare the response time and availability from different network zones.
+For example, if a PoP server running in the LAN network performs well, but a PoP server located on a WAN network is performing poorly, it is clear indication that the problem is the network or load balancer rather than the application.
+
+In the lab, we will begin by installing the "Synethetic Point of Presence".
 
 ## 1. Install Synthetic Point of Presence component
 
-1.1 Access to bastion node.
-Navigate to "instana-core" namespace and edit core component of Instana backend cluster by commands:
+1.1 We will be installing the Synthetic Point of Presence into the OpenShift (OCP) cluster.   In order to do that, we'll need access to a CLI will access to the OCP cluster.
+
+From the student VM, open a terminal window and type"
+
+```sh
+ssh root@bastion
+```
+
+When prompted, enter the password for the Bastion node.
+
+Make sure you are logged into the OCP cluster by typing "oclogin"
+
+In addition, some features must be enabled in the Instana server in order for you to use the synthetic features.  Follow the steps below to enable the synthetics feature within the Instana server.
+
+
+Change projects to the "instana-core" namespace and edit core component of Instana backend cluster by commands:
 ```bash
 oc project instana-core
 oc edit core
@@ -32,8 +57,18 @@ spec:
   - enabled: true
     name: feature.synthetic.browser.script.enabled
 ```
-Pay attention to indentation.
-Save and exit. 
+
+You can copy/paste the yaml from the lab guide into the the Instana "core" object as seen below.
+
+![](images/pasteFeature.png)
+
+Pay attention to indentation since this is yaml.  All entries must be indented by 0, 2, 4, 6 spaces, etc.
+Save and exit by typing:
+
+```sh
+:wq
+```
+
 
 1.3 Ensure synthetic pods have started sucessfully:
 ```text
@@ -45,6 +80,8 @@ synthetics-writer-579d5cf458-7tx7q             1/1     Running   0          5m
 [root@localhost ~]# 
 ```
 
+At this point, the Instana server is capable of running and displaying synthetic tests, but you still need to setup the "Synthetic Point of Presence".
+
 1.4 If Helm wasn't installed during previous labs, install it on bastion node now with command:
 ```bash
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
@@ -53,37 +90,65 @@ curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 1.5 Click on "Synthetic Monitoring" and then on "Deploy a PoP" button:
 ![](images/DeployAPoP.png)
 
-Use "Simple" tab for Helm command. For Synthetic Point of Presence we need to provide certain parameters. 
+Use "Simple" tab for Helm command. 
 
-***Add `--set seccompDefault=true \`*** as in example below:
+You will need to edit the information contained in the helm command, so copy and paste the text into a temporary file.
 
-![](images/synthetic-command-helm.png)
-As soon as the version of OCP in the lab higher than 4.11 then it is necessary to set parameter `--set seccompDefault=true`, otherwise controller pod container will not be able to run after creation.
+The default helm command will look as follows.  Some of the parameters have been replace with "xxx" for security reasons.
+```sh
+helm install synthetic-pop \
+	--repo "https://agents.instana.io/helm" \
+	--namespace <namespace> \
+	--create-namespace \
+	--set downloadKey="xxx" \
+	--set controller.location="<yourLocationName>;<yourLocationDisplayName>;<yourLocationCountry>;<yourLocationCity>;0;0;<yourLocationDescription>" \
+	--set controller.clusterName="<yourClusterName>" \
+	--set controller.instanaKey="xxx" \
+	--set controller.instanaSyntheticEndpoint="https://xxx" \
+	--set redis.tls.enabled=false \
+	--set redis.password="<yourPassword>" \
+	synthetic-pop
+  ```
 
-In the example above there are following flags:
-* **controller.location** - includes Name; Display name; Country; City; Latitude; Longitude; Description. This information is used to differentiate this Synthetic Point of Presence from others.
-* **controller.instanaSyntheticEndpoint** - address of a Synthetic acceptor on Instana backend server, that we configured previously.
-* **redis.password** - redis password that will be established by Synthetic Point of Presence upon redis deployment.
-* **seccompDefault** - required parameter with value `true` when Synthetic Point of Presence is being installed on OCP >= v4.11
+For Synthetic Point of Presence we need to modify some of the parameters and provide one additional parameter.  
 
-Copy helm command to any text editor and specify values:
-- controller.location
-- controller.clusterName
-- redis.password
-- seccompDefault
+- ***Add `--set seccompDefault=true \`***.  This parameter is required for OpenShift versions 4.11 and above
+- Then, modify the **controller.clusterName** parameter and provide a meaningful name.
+- In the **controller.location**, specify a name, display name, country, etc. for your "Point of Presence".   The "0;0" parameter represents the longituded and latitude of the "Point of Presence".  These parameters help identify the Point of Presence when  there multiples deployed.
+- Finally, enter a redis password.  This can be any value since you are setting the password.
 
-and Install Synthetic Point of Presence using the command similar to:
+The helm chart should lnow ook similar the following:
 
 ```text
+helm install synthetic-pop \
+     --repo https://agents.instana.io/helm  \
+     --namespace instana-synthetic \
+     --create-namespace \
+    --set downloadKey="xxx" \
+     --set controller.location="Local;on Instana cluster;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
+     --set controller.instanaKey="xxx" \
+     --set controller.clusterName="MyInstanaCluster" \
+     --set controller.instanaSyntheticEndpoint="https://xxx/synthetics" \
+     --set redis.tls.enabled=false \
+     --set redis.password="a1fc5d01bcbb" \
+     --set seccompDefault=true \
+     synthetic-pop
+```
+
+Copy the helm command from the text file and paste it into a terminal window on the Bastion node.  This will execute the helm chart.
+
+You should see an output similar to the following:
+
+```sh
 [sysadmin@bastion ~]$ helm install synthetic-pop \
 >     --repo https://agents.instana.io/helm  \
 >     --namespace instana-synthetic \
 >     --create-namespace \
->     --set downloadKey="<YOUR_DOWNLOAD_KEY>" \
+>     --set downloadKey="xxx" \
 >     --set controller.location="Local;on Instana cluster;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
->     --set controller.instanaKey="<YOUR_DOWNLOAD_KEY>" \
+>     --set controller.instanaKey="xxx" \
 >     --set controller.clusterName="MyInstanaCluster" \
->     --set controller.instanaSyntheticEndpoint="https://apps.ocp.ibm.edu/synthetics" \
+>     --set controller.instanaSyntheticEndpoint="https://xxx/synthetics" \
 >     --set redis.tls.enabled=false \
 >     --set redis.password="a1fc5d01bcbb" \
 >     --set seccompDefault=true \
@@ -92,22 +157,86 @@ NAME: synthetic-pop
 LAST DEPLOYED: Thu Jul 13 07:49:37 2023
 NAMESPACE: instana-synthetic
 STATUS: deployed
-[sysadmin@bastion ~]$
 ```
-
 
 1.6 After the Synthetic point of presence is installed verify its appearence in the interface:
 
 ![](images/PointOfPresence_Location.png)
 
-## 2. Using script for REST API check
+You can also confirm that the Synthetic Point of Presence is running by typing:
+```sh
+oc get pods -n instna-synthetic
+```
+Confirm that the pods are all running.
+
+
+## 2. REST API Synthetic Tests
 In the exercise we will follow creating a test of series of probes and as example will monitor number of managed objects. 
 
 We will interrogate Instana backend as an example of external application.
 
-### 2.1. Creating personal API token
 
-As soon as we will check availability of Instana backend, we need a token to request data from backend. Token is a part of authentication and authorization mechanism, that allows access to certain kinds of data. We will create a basic token at requests we are planing to place during the lab do not require special rights.
+### 2.1 Simple REST API test
+Let's begin by executing a simple REST API test.  This will be a single REST GET request.
+
+Begin by selecting "Synthetics" and then "+ ADD" as seen below.
+
+![](images/addSynthetics.png)
+
+Then, click the **Add Synthetic Test** button.
+
+![](images/addSynthetics2.png)
+
+On the dialog that opens, you will see that you have the option of an **API Simple** test or an **API Script** test.   Leave the default of **API Simple** and click the **Next** button.
+
+![](images/addSynthetics3.png)
+
+A new dialog will open prompting for the REST API **GET** URL.   Enter the following URL:
+```sh
+http://10.100.1.60:32000/random
+```
+
+This could be any REST request. In this case, we are testing the **Random** API call within the **Quote of the Day** application.
+
+Then, select your **Point of Presence** location and click **Next**
+
+![](images/addSynthetics4.png)
+
+The next screen allows you to specify the scheduling interval for your synthetic test.  Drag the time slider to 1 minute.  Then, select **Next**
+
+![](images/scheduling.png)
+
+On the next screen you will give your syntetic test a name and description.  Then, optionally, associate the synthetic test with an application.  In this case, select the checkbox next to the **Quote of the Day** application since we are testing the **Random** API call for the **Quote of the Day ** application.
+
+Finally, click the **Create** button to finish creating your synthetic test.
+
+
+![](images/testName.png)
+
+
+At this point, you should see a synthetic test named **Random Quote**.  
+
+![](images/randomQuote.png)
+
+Click on the **Random Quote** link to drill down into the details of the synthetic test.
+
+It will take a couple of minutes for the synthetic tests to begin executing.
+
+On the screen, you can see a summary of the synthetic results.  You can also click on the **Results** tab and see the detailed results of each synthetic test.
+
+![](images/syntheticResults.png)
+
+
+You have not create a synthetic test against a single REST API.  Next, we will be learning how to create more complex synthetics using javascript.  
+The example we will be using will actually be executing against the Instana server.  In order to access the Instana REST APIs, you must first generate an API token.  That will be our next step.,
+
+
+
+### 2.2. Creating an API token
+
+Since we will be using the Instana REST APIs to test the availability of Instana backend, we need an API token to request data from Instana server. 
+API Tokens are a part of authentication and authorization mechanism, that allows access to certain kinds of data. 
+We will create a basic token since the APIs we are planning to use do not require special permissions.
 
 Create token by selecting "Settings" -> "Team Settings" -> "API Token" -> "Add API Token":
 
@@ -117,25 +246,35 @@ Give it a name:
 
 ![](images/SyntheticTestName.png)
 
-There are no extra permissions needed for the lab, basic set is enough.
+You will notice that there are many toggles that allow you to assign additional permissions.   But, we are only accessing REST APIs with read-only permissions that do not require any additional permissions.
+
+You will need to save your REST API Token so that you can use it in the javascript   In order to save the API Token, click on the **eye** icon.
+
+![](images/APIToken.png)
+
+After clicking the **eye** icon, you will see the **API Token** and you'll see an icon that allows you to copy the API Token.  Click on the **copy** icon and see the API Token.
+The API Token is now in your clipboard, but it probably makes sense to save it to a file so that you can access it later.
+
+![](images/APIToken2.png)
+
 
 Click "Save" at the bottom of the page. 
 
 
-### 2.2. Creating REST API test
+### 2.3. Creating REST API test
 
 Synthetic scripts may include several calls and different types GET/POST/PUT/DELETE in the same test. During the lab we will be doing two GET requests:
-- Checking if Instana backend as a target application returns positive code (200)
-- Checking the number of currently reporting agents is less than threshold
+- First, we will check if Instana backend as a target application returns success code of **200**
+- Next, the script will check the number of currently reporting agents and confirm that it is less than a threshold.
 
-2.2.1 Right click on "Synthetic Monitoring" and open it in a new browser tab:
+2.3.1 Right click on "Synthetic Monitoring" and open it in a new browser tab:
 ![](images/SyntheticsInANewTab.png)
 
-2.2.2 To create synthetic test switch to just created browser tab with "Synthetic Monitoring" and click "+ ADD" button on the right bottom corner:
+2.3.2 To create synthetic test switch to just created browser tab with "Synthetic Monitoring" and click "+ ADD" button on the right bottom corner:
 
 ![](images/AddSynthetic.png)
 
-2.2.3 Choose "Add Synthetic Test"
+2.3.3 Choose "Add Synthetic Test"
 
 Select "Script API" and click "Next" button:
 
@@ -146,9 +285,15 @@ Select "Script API" and click "Next" button:
 Use text editor to paste the code into lab environment and than copy from that text editor to the field to avoid errors in the code while pasting directly to the lab environment and the field at once.
 To open text editor: click Activities on the left top corner -> Select 9 dots (Show Applications) -> Choose "Text Editor".
 
+![](images/textEditor.png)
 :::
 
-2.2.4 Paste the script into a field as shown below:
+In order to paste content into the VM, select the **send text** icon.  Then, paste in the content and click the **Send Text** button at the bottom of the dialog.
+
+![](images/pasteText.png)
+
+
+2.3.4 Paste the script into a field as shown below:
 ```javascript
 var assert=require('assert');
 
@@ -195,46 +340,48 @@ $http.get(options, function(error, response, body) {
 });
 ```
 
+In the javascript, you will need to replace the API Token shown above (0GKMs6mpSXqK9WMByM5lbg) with the API Token you generated earlier.
+
 As follows:
 
 ![](images/Create_Synthetic_Test.png)
 
-2.2.5 For the test we need Instana token, created on previous step. 
+2.3.5 For the test we need the Instana token that we created on previous step.  If you didn't save the API Token, you can use the following steps to retrieve the token.
    - Switch to previous browser tab with Tokens: ![](images/TokenEye.png)
    - Click on eye on the right from the token and copy text.
    - Switch back to browser tab with script
    - Paste Token as value for TOKEN variable (line 9 on screenshot above)
 
-2.2.6 Instana will run the script from previously installed Synthetic Point of Presence, they can be placed at multiple locations across available infrastructure. The one we will use is deployed on the same cluster with Instana, it may have different name. Select it for our test.
+2.3.6 Instana will run the script from previously installed Synthetic Point of Presence, they can be placed at multiple locations across available infrastructure. The one we will use is deployed on the same cluster with Instana, it may have different name. Select it for our test.
    
 Click Next
 
 
-2.2.7 Adjust time slider to run test every minute:
+2.3.7 Adjust time slider to run test every minute:
 ![](images/TimeSlider.png)
 
 and click "Next" button.
 
 
-2.2.8 Give the test meaningful name and description:
+2.3.8 Give the test meaningful name and description:
 ![](images/CreateSynthTest.png)
 
 At the dialog under "Select an Application" you may specify the list of existing applications for which the test is relevant. The result of the test will appear at the "Synthetic Monitoring" tab of the Application dashboard and you will be able to filter tests by application on Synthetic Monitoring dashboard.
 
 Click "Create" button.
 
-2.2.9 It may take up to minute for Instana to perform the first test and show the line with results. You can refresh browser window and changing time duration for the dashboard on right top of the window to speed up the line to appear before the results of first test will be processed.
+2.3.9 It may take up to minute for Instana to perform the first test and show the line with results. You can refresh browser window and changing time duration for the dashboard on right top of the window to speed up the line to appear before the results of first test will be processed.
 
 By now you should see a list of tests:
 ![](images/ListOfTests.png)
 
-2.2.10 Click on the test name to access the dashboard of the synthetic test:
+2.3.10 Click on the test name to access the dashboard of the synthetic test:
 
 ![](images/SyntheticTestDashboard.png)
 
 At the moment we have 2 agents reporting to the backend, so the assert of the last check has been passed. We will adjust threshold of the assert to 1 so we can trigger the synthetic test to fail.
 
-2.2.11 Repeat the creation step 2.2 for additional "Failing test" with the script adjusted as `assert.ok(bodyObj.hostCount < 1,` at the last request instead of `< 4` as below:
+2.3.11 Repeat the creation step 2.3 for additional "Failing test" with the script adjusted as `assert.ok(bodyObj.hostCount < 1,` at the last request instead of `< 4` as below:
 
 ```javascript
 ...
@@ -252,7 +399,7 @@ In the case the result will indicate that the parameter is out of the desired am
 
 ## 3. Create smart Alert for test
 
-Smart Alerts allow to escalate determined violation to umbrella monitoring systems like Watson AIOps or Email, Slack, Service Now, etc. in Instana it is called channel. 
+Smart Alerts allow you to identify a threshold violation.   Then, if desired, Alert people via external systems like Watson AIOps or Email, Slack, Service Now, etc. in Instana the notification mechanism is called an **Alert Channel** 
 
 3.1 Click "Synthetic Monitoring" -> "Smart Alerts" -> "ADD SYNTHETIC SMART ALERT":
 ![](images/AddSmartAlert.png)
