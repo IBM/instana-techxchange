@@ -31,14 +31,15 @@ Then, click "Sign In" to log into the Instana user interface.
 
 ![agent5](images/signIn.png)
 
-Click on "Deploy agent" link as described on the below picture
+Click on the "Stan" icon in the upper left corner (1). Then, Click on the "Deploy agent" link (2) as shown below.
 
 ![agent1](images/agent-install-001-fixed.png)
 
-Select Kubernetes (1) and choose Helm installation option (3). 
-Enter a Cluster Name (3).  In the example, we have specified "kube-cluster".
-Enter a Zone Name such as "kube-zone" (4).  
-Finally, copy the helm chart installation script (5).
+- In the "Install Agents" dialog, select "Kubernetes" (1).
+- Then, choose the "Helm chart" installation option (2). 
+- Enter a Cluster Name (3).  In the example, we have specified "kube-cluster".
+- Enter a Zone Name such as "kube-zone" (4).  
+- Finally, copy the helm chart installation script (5).
 
 ![agent2](images/helmChart.png)
 
@@ -54,7 +55,8 @@ When prompted, enter the root password.
 
 paste the copied helm chart installation script and hit enter
 
-Note:   Do Not copy the example shown below.  It does not contain a valid downloadKey and agent.key.  This information must be obtained from your Instana server.
+Note:   Do Not copy the example shown below.  It does not contain a valid downloadKey and agent.key.  This information must be obtained from your Instana server.  
+Notice that agent.key, agen.downloadKey, and agent.endpointHost are "xxx".  You values must be copied from the Instana UI so that they match your environment.
 
 ```sh
 helm install instana-agent \
@@ -62,7 +64,7 @@ helm install instana-agent \
    --namespace instana-agent \
    --create-namespace \
    --set agent.key=xxx \
-   --set agent.downloadKey=xxxx \
+   --set agent.downloadKey=xxx \
    --set agent.endpointHost=xxx \
    --set agent.endpointPort=443 \
    --set cluster.name='kube-cluster' \
