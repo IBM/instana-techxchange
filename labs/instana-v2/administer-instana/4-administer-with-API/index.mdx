@@ -79,8 +79,10 @@ Website monitoring configuration\
 
 >>>![](images/api_6.png)
 
-7. Create an environment variable **API_TOKEN** on the bastion host
+7. Create a **HOST** and **API_TOKEN** environment variables on the bastion host
 
+    export HOST=192.168.252.60
+    export API_TOKEN=token from step 6
 
 
 ## 4.2: Application Metrics
@@ -88,9 +90,125 @@ Website monitoring configuration\
 
 ### List all applications
 
-### List all applications in critical health
+Request:
 
-### List applications with by host
+ curl -k --silent -X GET -H "authorization: apiToken $API_TOKEN"  "https://$HOST/api/application-monitoring/applications?pretty"
+
+Response:
+
+```json
+{
+  "items" : [ {
+    "id" : "hov5KXevQMW8cM5wnGqgZw",
+    "label" : "Robot-Shop",
+    "boundaryScope" : "ALL",
+    "entityType" : "APPLICATION",
+    "_links" : {
+      "self" : "https://192.168.252.60/api/application-monitoring/applications;id=hov5KXevQMW8cM5wnGqgZw?to=1692667910745&windowSize=600000",
+      "services" : "https://192.168.252.60/api/application-monitoring/applications;id=hov5KXevQMW8cM5wnGqgZw/services?to=1692667910745&windowSize=600000"
+    }
+  }, {
+    "id" : "USD9KEU_SWaBbvj6AxubSA",
+    "label" : "qotd",
+    "boundaryScope" : "ALL",
+    "entityType" : "APPLICATION",
+    "_links" : {
+      "self" : "https://192.168.252.60/api/application-monitoring/applications;id=USD9KEU_SWaBbvj6AxubSA?to=1692667910745&windowSize=600000",
+      "services" : "https://192.168.252.60/api/application-monitoring/applications;id=USD9KEU_SWaBbvj6AxubSA/services?to=1692667910745&windowSize=600000"
+    }
+  }, {
+    "id" : "_8O83anZQW-72LB-HtBECg",
+    "label" : "All Services",
+    "boundaryScope" : "INBOUND",
+    "entityType" : "APPLICATION",
+    "_links" : {
+      "self" : "https://192.168.252.60/api/application-monitoring/applications;id=_8O83anZQW-72LB-HtBECg?to=1692667910745&windowSize=600000",
+      "services" : "https://192.168.252.60/api/application-monitoring/applications;id=_8O83anZQW-72LB-HtBECg/services?to=1692667910745&windowSize=600000"
+    }
+  } ],
+  "page" : 1,
+  "pageSize" : 50,
+  "totalHits" : 7,
+  "adjustedTimeframe" : {
+    "windowSize" : 590000,
+    "to" : 1692667910000
+  },
+  "_links" : {
+    "self" : "https://192.168.252.60/api/application-monitoring/applications?to=1692667910745&windowSize=600000&page=1&pageSize=50"
+  }
+}
+```
+
+### List applications with errors
+
+Request:
+
+```json
+ curl -k -X POST  -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: apiToken $API_TOKEN" \
+  "https://$HOST/api/application-monitoring/metrics/applications?pretty" \
+  -d '
+{
+  "applicationBoundaryScope": "ALL",
+  "label": "Robot-Shop",
+  "metrics": [
+    {
+      "aggregation": "SUM",
+      "granularity": 0,
+      "metric": "http.5xx"
+    }
+  ]
+}'
+```
+
+Response:
+
+```json
+{
+  "items" : [ {
+    "application" : {
+      "id" : "_8O83anZQW-72LB-HtBECg",
+      "label" : "All Services",
+      "boundaryScope" : "ALL",
+      "entityType" : "APPLICATION"
+    },
+    "metrics" : {
+      "http.5xx.sum" : [ [ 1692671360000, 13822.0 ] ]
+    }
+  }, {
+    "application" : {
+      "id" : "USD9KEU_SWaBbvj6AxubSA",
+      "label" : "qotd",
+      "boundaryScope" : "ALL",
+      "entityType" : "APPLICATION"
+    },
+    "metrics" : {
+      "http.5xx.sum" : [ [ 1692671360000, 0.0 ] ]
+    }
+  },{
+    "application" : {
+      "id" : "hov5KXevQMW8cM5wnGqgZw",
+      "label" : "Robot-Shop",
+      "boundaryScope" : "ALL",
+      "entityType" : "APPLICATION"
+    },
+    "metrics" : {
+      "http.5xx.sum" : [ [ 1692671360000, 13822.0 ] ]
+    }
+  } ],
+  "page" : 1,
+  "pageSize" : 20,
+  "totalHits" : 7,
+  "adjustedTimeframe" : {
+    "windowSize" : 600000,
+    "to" : 1692671360000
+  }
+}
+```
+
+
+Note the above metric request can be replaced by http.4xx or http.3xx http return codes. 
+
+### List applications by host
 
 ### Query application services by application name
 
