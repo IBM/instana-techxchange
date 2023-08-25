@@ -86,8 +86,8 @@ Website monitoring configuration\
     ![](images/open-terminal.png)
 
 
-    export HOST=dev-aiops.apps.ocp.ibm.edu  <br /> 
-    export API_TOKEN=<Token from step #6>
+    export host=dev-aiops.apps.ocp.ibm.edu  <br /> 
+    export apiToken=<Token from step #6>
 
 
 :::tip
@@ -106,53 +106,13 @@ The API calls will be done in the same terminal Window. Copy and Paste the reque
 Request:
 
 ```json
- curl -k --silent -X GET -H "authorization: apiToken $API_TOKEN"  "https://$HOST/api/application-monitoring/applications?pretty"
+ curl -k --silent -X GET -H "authorization: apiToken $apiToken"  "https://$host/api/application-monitoring/applications?pretty"
 ```
 
-Response:
+Response 
 
-```json
-{
-  "items" : [ {
-    "id" : "hov5KXevQMW8cM5wnGqgZw",
-    "label" : "Robot-Shop",
-    "boundaryScope" : "ALL",
-    "entityType" : "APPLICATION",
-    "_links" : {
-      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications;id=hov5KXevQMW8cM5wnGqgZw?to=1692667910745&windowSize=600000",
-      "services" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications;id=hov5KXevQMW8cM5wnGqgZw/services?to=1692667910745&windowSize=600000"
-    }
-  }, {
-    "id" : "USD9KEU_SWaBbvj6AxubSA",
-    "label" : "qotd",
-    "boundaryScope" : "ALL",
-    "entityType" : "APPLICATION",
-    "_links" : {
-      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications;id=USD9KEU_SWaBbvj6AxubSA?to=1692667910745&windowSize=600000",
-      "services" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications;id=USD9KEU_SWaBbvj6AxubSA/services?to=1692667910745&windowSize=600000"
-    }
-  }, {
-    "id" : "_8O83anZQW-72LB-HtBECg",
-    "label" : "All Services",
-    "boundaryScope" : "INBOUND",
-    "entityType" : "APPLICATION",
-    "_links" : {
-      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications;id=_8O83anZQW-72LB-HtBECg?to=1692667910745&windowSize=600000",
-      "services" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications;id=_8O83anZQW-72LB-HtBECg/services?to=1692667910745&windowSize=600000"
-    }
-  } ],
-  "page" : 1,
-  "pageSize" : 50,
-  "totalHits" : 7,
-  "adjustedTimeframe" : {
-    "windowSize" : 590000,
-    "to" : 1692667910000
-  },
-  "_links" : {
-    "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications?to=1692667910745&windowSize=600000&page=1&pageSize=50"
-  }
-}
-```
+![](images/applications_api_response.png)
+
 
 ### List applications with errors
 
@@ -161,8 +121,8 @@ The request will list all applications monitored by the Instana agent that are t
 Request:
 
 ```json
- curl -k -X POST  -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: apiToken $API_TOKEN" \
-  "https://$HOST/api/application-monitoring/metrics/applications?pretty" \
+ curl -k -X POST  -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: apiToken $apiToken" \
+  "https://$host/api/application-monitoring/metrics/applications?pretty" \
   -d '
 {
   "applicationBoundaryScope": "ALL",
@@ -179,48 +139,9 @@ Request:
 
 Response:
 
-```json
-{
-  "items" : [ {
-    "application" : {
-      "id" : "_8O83anZQW-72LB-HtBECg",
-      "label" : "All Services",
-      "boundaryScope" : "ALL",
-      "entityType" : "APPLICATION"
-    },
-    "metrics" : {
-      "http.5xx.sum" : [ [ 1692671360000, 13822.0 ] ]
-    }
-  }, {
-    "application" : {
-      "id" : "USD9KEU_SWaBbvj6AxubSA",
-      "label" : "qotd",
-      "boundaryScope" : "ALL",
-      "entityType" : "APPLICATION"
-    },
-    "metrics" : {
-      "http.5xx.sum" : [ [ 1692671360000, 0.0 ] ]
-    }
-  },{
-    "application" : {
-      "id" : "hov5KXevQMW8cM5wnGqgZw",
-      "label" : "Robot-Shop",
-      "boundaryScope" : "ALL",
-      "entityType" : "APPLICATION"
-    },
-    "metrics" : {
-      "http.5xx.sum" : [ [ 1692671360000, 13822.0 ] ]
-    }
-  } ],
-  "page" : 1,
-  "pageSize" : 20,
-  "totalHits" : 7,
-  "adjustedTimeframe" : {
-    "windowSize" : 600000,
-    "to" : 1692671360000
-  }
-}
-```
+![](images/500_error_response.png)
+
+
 
 ### Query application services by application name
 
@@ -229,74 +150,117 @@ The request will list all applications monitored by the Instana agent that are t
 Request:
 
 ```json
-curl -k --silent -X GET -H "authorization: apiToken $API_TOKEN"  "https://$HOST/api/application-monitoring/applications/services?pretty" -d 'nameFilter=Robot-Shop'
+curl -k --silent -X GET -H "authorization: apiToken $apiToken"  "https://$host/api/application-monitoring/applications/services?pretty" -d 'nameFilter=Robot-Shop'
 ```
 
 Response:
 
+![](images/services_api_response.png)
+
+## 4.3: Infrastructure-level metrics
+
+
+In this section we will use the Instana applciation interface to help build the API calls required to fetch Infrastucture information for an application. 
+
+
+### List hosts monitoried by Instana
+
+1. From the Instana applciation, Select the Analytics icon 
+
+
+  ![](images/analytics.png)
+
+
+2. From the drop-down menu, select Infrastructure
+
+![](images/infrastructure.png)
+
+
+3. In the search field, enter Host to filter the results and select the **Host** Entity Type
+
+![](images/host_filter.png)
+
+4. Select the API query option on the left to view the API curl command
+
+![](images/select_api_query.png)
+
+
+5. We will use a Text Editor to make minor updates to the API query before we run it on the Terminal window. To open the text editor, select the Activities icon on the left and Type Text Editor in the searcd box
+
+![](images/activities.png)
+
+
+6. Copy the curl command from the API query
+
+![](images/select_api_query.png)
+
+
+7. Paste the curl command to the text Editor
+
+![](images/text_editor.png)
+
+8. Make the following changes ot he curl command before running it in the Terminal window
+
+   1. Add **-k** after the curl command to bypass the SSL certificate
+   2. Add **?pretty** to make the output more readable
+
+
+9. The final query will look like this:
+
+![](images/curl_api_query.png)
+
+10. Run the Curl command by copying and pasteing it to the Terminal window
+
+![](images/copy_curl.png)
+
+11. Right click on the Terminal window and select **paste*
+
+![](images/paste_curl.png)
+
+12. Run the curl command that will list the hosts
+
+![](images/hosts_api.png)
+
+### List the services running on a host
+
+We will now use the Response Output from the previous curl command. The **snapshotId** in the response will be used in the next curl command to list services running on a host.
+
+Use the follwoing steps to copy the curl command to the Terminal and update the snapshotId for the host labeled **kube-rs**
+
+1. Copy the snapshotId from the response of the curl command in step 12. 
+   
+   ![](images/copy_snapshotid.png)
+   
+2. Copy the curl command below and paste it to the terminal
+   
+Request:
+
 ```json
-{
-  "items" : [ {
-    "id" : "f9c1fe23e71948b618b228e526fb27d761fa7f66",
-    "label" : "zookeeper",
-    "types" : [ ],
-    "technologies" : [ "jvmRuntimePlatform", "zooKeeper" ],
-    "snapshotIds" : [ ],
-    "entityType" : "SERVICE",
-    "_links" : {
-      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=f9c1fe23e71948b618b228e526fb27d761fa7f66?to=1692708030444&windowSize=600000",
-      "endpoints" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=f9c1fe23e71948b618b228e526fb27d761fa7f66/endpoints?to=1692708030444&windowSize=600000"
-    }
-  }, {
-    "id" : "4e014220bc3eebb5e5bcdc244c73a0109296562a",
-    "label" : "yl-public.skillsnetwork.site",
-    "types" : [ "HTTP" ],
-    "technologies" : [ ],
-    "snapshotIds" : [ ],
-    "entityType" : "SERVICE",
-    "_links" : {
-      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=4e014220bc3eebb5e5bcdc244c73a0109296562a?to=1692708030444&windowSize=600000",
-      "endpoints" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=4e014220bc3eebb5e5bcdc244c73a0109296562a/endpoints?to=1692708030444&windowSize=600000"
-    }
-  }, {
-    "id" : "f0fcaa6767a729a923460a0fee7e2710fbd27ba8",
-    "label" : "yl-public-redisha.yl-public.svc.cluster.local:26379",
-    "types" : [ "DATABASE" ],
-    "technologies" : [ "redis" ],
-    "snapshotIds" : [ ],
-    "entityType" : "SERVICE",
-    "_links" : {
-      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=f0fcaa6767a729a923460a0fee7e2710fbd27ba8?to=1692708030444&windowSize=600000",
-      "endpoints" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=f0fcaa6767a729a923460a0fee7e2710fbd27ba8/endpoints?to=1692708030444&windowSize=600000"
-    }
-  }, {
-    "id" : "1b5e8ac09a7837f059a2624a820f7da18c9de6a3",
-    "label" : "yl-public-proxysql.yl-public.svc.cluster.local",
-    "types" : [ "DATABASE" ],
-    "technologies" : [ "mySqlDatabase" ],
-    "snapshotIds" : [ ],
-    "entityType" : "SERVICE",
-    "_links" : {
-      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=1b5e8ac09a7837f059a2624a820f7da18c9de6a3?to=1692708030444&windowSize=600000",
-      "endpoints" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=1b5e8ac09a7837f059a2624a820f7da18c9de6a3/endpoints?to=1692708030444&windowSize=600000"
-    }
-  }
-  ```
+ curl -k --silent -X GET -H "authorization: apiToken $apiToken"  "https://$host/api/infrastructure-monitoring/snapshots/<snaphostId>?pretty"
+```
 
-## 4.3: Event Management 
-
-### List of open Events
-
-### List of open Events in the last 10 minutes
+![](images/copy_curl_snapshot.png)
 
 
+3. Update the snapshotId in the commend with the snapshotId by removing the **snapshotId** and pasting the coppied id. 
+   
+   ![](images/updated_snapshotId.png)
 
-## 4.4: User Management 
+4. Run the Curl command to list services running on the host kube-rs
 
-### Get list or users
+The service routes are listed with their ip, subnet and Fully Qualified Domain Name
 
-### Invite a user
+![](images/applicaiton_routes.png)
 
-### Remove a user
+The Host information includes filesystem, OS and Machine id. This is typically helpful for mapping host informaiotn with external data sources.
+
+![](images/host_subnets.png)
+
+## 4.4: Summary
+
+At this point, you have used the APIs to fetch both Application and Infrasturcture metrics. 
+
+Instana OpenAPI documentation : https://instana.github.io/openapi/
+
 
 ---
