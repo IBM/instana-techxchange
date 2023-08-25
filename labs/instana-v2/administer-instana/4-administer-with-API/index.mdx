@@ -8,7 +8,7 @@ sidebar_position: 4
 
 
 In this section of the lab we will create an API Token that will be used for executing the Instana Rest API calls. The Instana web REST API allows for retrieval of data such as traces and metrics, as well as configuration, such as service extraction and user management.
-In order to use the web REST API, you need to create an API token and assign permissions.
+In order to use the web REST API, you need to create an API token and assign permissions. Follwo these steps to create a new API token
 
 
 From the Bastion host open the Firefox browser and select the **Instana**
@@ -18,10 +18,12 @@ bookmark.
 
 If you are unsure how to get access to the Bastion host (Guacamole) see
 [Accessing a Lab Environment](/instana-techxchange/labs/jam-in-a-box/#accessing-a-lab-environment)
-
 :::
 
-![open firefox](../3-administer/images/open-firefox.png)
+
+![open firefox](images/open-firefox.png)
+
+
 
 :::info
 
@@ -31,16 +33,14 @@ You can safely ignore the warning about the certificate being untrusted.
 
 :::
 
-When prompted, enter the username and password that you updated earlier.
-
-- Username: **admin@instana.local**
-- Password: **Passw0rd**
+When prompted, enter the username and password from the credentials file.
 
 ![](../3-administer/images/login.png)
 
+
 ## 4.1: Create an Instana API Token
 
-1. Logon to the Instana and select the Settings on the left menu
+1. Select **Settings** on the left menu
 
 >>>![](images/api_1.png)
 
@@ -55,18 +55,18 @@ When prompted, enter the username and password that you updated earlier.
 
 4. In the **Permissions** section enable the following permissions
 
->>> User management\
-Configuration of applications\
-Service & endpoint mapping\
-Configuration of automation actions\
-Execution of automation actions\
-Configuration of alert channels\
-Configuration of Events, Alerts and Smart Alerts\
-Configuration of global custom payload for alerts\
-Configuration of global Smart Alerts\
-Configuration of releases\
-Configuration of agents\
-Website monitoring configuration\
+>>> User management <br/>
+Configuration of applications <br/>
+Service & endpoint mapping <br/>
+Configuration of automation actions <br/>
+Execution of automation actions <br/>
+Configuration of alert channels <br/>
+Configuration of Events, Alerts and Smart Alerts <br/>
+Configuration of global custom payload for alerts <br/>
+Configuration of global Smart Alerts <br/>
+Configuration of releases <br/>
+Configuration of agents <br/>
+Website monitoring configuration <br/>
 
 >>>![](images/api_4.png)
 
@@ -79,73 +79,51 @@ Website monitoring configuration\
 
 >>>![](images/api_6.png)
 
-7. Create a **HOST** and **API_TOKEN** environment variables on the bastion host
+7. Create a **host** and **apiToken** environment variables on the bastion host
 
-    export HOST=192.168.252.60
-    export API_TOKEN=token from step 6
+    1. Open the Terminal window on the Bastion host by selecting the Terminal icon on the desktop
 
+    ![](images/open-terminal.png)
+
+    2. Copy and paste the follwoign export commands to the terminal window
+   
+        export host=dev-aiops.apps.ocp.ibm.edu  <br /> 
+        export apiToken=<Token from step #6>
+
+
+:::tip
+To copy and paste from teh lab guide to the bastion host window, use the Insert Text icon at the top of the window.
+
+![](images/copy-and-paste.png)
+:::
 
 ## 4.2: Application Metrics
 
+
+The Application Metrics API calls will be run in the terminal Window. To Run the Curl commands, copy and paste the request curl command to the Terminal window.
 
 ### List all applications
 
 Request:
 
- curl -k --silent -X GET -H "authorization: apiToken $API_TOKEN"  "https://$HOST/api/application-monitoring/applications?pretty"
-
-Response:
-
 ```json
-{
-  "items" : [ {
-    "id" : "hov5KXevQMW8cM5wnGqgZw",
-    "label" : "Robot-Shop",
-    "boundaryScope" : "ALL",
-    "entityType" : "APPLICATION",
-    "_links" : {
-      "self" : "https://192.168.252.60/api/application-monitoring/applications;id=hov5KXevQMW8cM5wnGqgZw?to=1692667910745&windowSize=600000",
-      "services" : "https://192.168.252.60/api/application-monitoring/applications;id=hov5KXevQMW8cM5wnGqgZw/services?to=1692667910745&windowSize=600000"
-    }
-  }, {
-    "id" : "USD9KEU_SWaBbvj6AxubSA",
-    "label" : "qotd",
-    "boundaryScope" : "ALL",
-    "entityType" : "APPLICATION",
-    "_links" : {
-      "self" : "https://192.168.252.60/api/application-monitoring/applications;id=USD9KEU_SWaBbvj6AxubSA?to=1692667910745&windowSize=600000",
-      "services" : "https://192.168.252.60/api/application-monitoring/applications;id=USD9KEU_SWaBbvj6AxubSA/services?to=1692667910745&windowSize=600000"
-    }
-  }, {
-    "id" : "_8O83anZQW-72LB-HtBECg",
-    "label" : "All Services",
-    "boundaryScope" : "INBOUND",
-    "entityType" : "APPLICATION",
-    "_links" : {
-      "self" : "https://192.168.252.60/api/application-monitoring/applications;id=_8O83anZQW-72LB-HtBECg?to=1692667910745&windowSize=600000",
-      "services" : "https://192.168.252.60/api/application-monitoring/applications;id=_8O83anZQW-72LB-HtBECg/services?to=1692667910745&windowSize=600000"
-    }
-  } ],
-  "page" : 1,
-  "pageSize" : 50,
-  "totalHits" : 7,
-  "adjustedTimeframe" : {
-    "windowSize" : 590000,
-    "to" : 1692667910000
-  },
-  "_links" : {
-    "self" : "https://192.168.252.60/api/application-monitoring/applications?to=1692667910745&windowSize=600000&page=1&pageSize=50"
-  }
-}
+ curl -k --silent -X GET -H "authorization: apiToken $apiToken"  "https://$host/api/application-monitoring/applications?pretty"
 ```
 
+Response 
+
+![](images/applications_api_response.png)
+
+
 ### List applications with errors
+
+The request will list all applications monitored by the Instana agent that are throwing http 5xx errors. The **metric** attribute in the request object can be changed to http.4xx or http.3xx as needed.
 
 Request:
 
 ```json
- curl -k -X POST  -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: apiToken $API_TOKEN" \
-  "https://$HOST/api/application-monitoring/metrics/applications?pretty" \
+ curl -k -X POST  -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: apiToken $apiToken" \
+  "https://$host/api/application-monitoring/metrics/applications?pretty" \
   -d '
 {
   "applicationBoundaryScope": "ALL",
@@ -162,71 +140,144 @@ Request:
 
 Response:
 
+![](images/500_error_response.png)
+
+
+
+### Query application services by an application name
+
+The request will list all applications monitored by the Instana agent that are throwing http 5xx errors. The nameFilter attribute in the request can be changed to the **qotd** applciaiton.
+
+Request:
+
 ```json
-{
-  "items" : [ {
-    "application" : {
-      "id" : "_8O83anZQW-72LB-HtBECg",
-      "label" : "All Services",
-      "boundaryScope" : "ALL",
-      "entityType" : "APPLICATION"
-    },
-    "metrics" : {
-      "http.5xx.sum" : [ [ 1692671360000, 13822.0 ] ]
-    }
-  }, {
-    "application" : {
-      "id" : "USD9KEU_SWaBbvj6AxubSA",
-      "label" : "qotd",
-      "boundaryScope" : "ALL",
-      "entityType" : "APPLICATION"
-    },
-    "metrics" : {
-      "http.5xx.sum" : [ [ 1692671360000, 0.0 ] ]
-    }
-  },{
-    "application" : {
-      "id" : "hov5KXevQMW8cM5wnGqgZw",
-      "label" : "Robot-Shop",
-      "boundaryScope" : "ALL",
-      "entityType" : "APPLICATION"
-    },
-    "metrics" : {
-      "http.5xx.sum" : [ [ 1692671360000, 13822.0 ] ]
-    }
-  } ],
-  "page" : 1,
-  "pageSize" : 20,
-  "totalHits" : 7,
-  "adjustedTimeframe" : {
-    "windowSize" : 600000,
-    "to" : 1692671360000
-  }
-}
+curl -k --silent -X GET -H "authorization: apiToken $apiToken"  "https://$host/api/application-monitoring/applications/services?pretty" -d 'nameFilter=Robot-Shop'
 ```
 
+Response:
 
-Note the above metric request can be replaced by http.4xx or http.3xx http return codes. 
+![](images/services_api_response.png)
 
-### List applications by host
+:::info
+Note, the screenshot does not list the complete set of services and the data may look different in your environment.
+:::
 
-### Query application services by application name
-
-
-## 4.3: Event Management 
-
-### List of open Events
-
-### List of open Events in the last 10 minutes
+## 4.3: Infrastructure-level metrics
 
 
+In this section we will use the Instana applciation interface to help build the API calls required to fetch Infrastucture information and correlate it to an Applciation. 
 
-## 4.4: User Management 
 
-### Get list or users
+### List hosts monitoried by Instana
 
-### Invite a user
+1. From the Instana applciation, Select the Analytics icon
 
-### Remove a user
+
+  ![](images/analytics.png)
+
+
+2. Select Infrastructure from the drop-down menu
+
+![](images/infrastructure.png)
+
+
+3. In the search field, enter **Host** to filter the results and select the **Host** Entity Type
+
+![](images/host_filter.png)
+
+4. Select the API query option on the left to view the API curl command
+
+![](images/select_api_query.png)
+
+
+5. We will use a Text Editor to make minor updates to the API query before we run it on the Terminal window. To open the text editor, select the Activities icon on the left and Type Text Editor in the searcd box
+
+![](images/activities.png)
+
+
+6. Copy the curl command from the API query
+
+![](images/select_api_query.png)
+
+
+7. Paste the curl command to the text Editor
+
+![](images/text_editor.png)
+
+8. Make the following changes to the curl command before running it in the Terminal window
+
+   1. Add **-k** after the curl command to accept the certificate
+   2. Add **?pretty** to make the output more readable
+
+
+9. The final query will look like this
+
+![](images/curl_api_query.png)
+
+10. Run the Curl command by copying and pasting it to the Terminal window
+
+![](images/copy_curl.png)
+
+11. Right click on the Terminal window and select **paste**
+
+![](images/paste_curl.png)
+
+12.  The API will list hosts monitored by Instana
+
+![](images/hosts_api.png)
+
+:::info
+A **snapshot** represents static information about an entity as it was at a specific point in time. To clarify: Static information is any information which is seldom changing, e.g. process IDs, host FQDNs or a list of host hard disks. The counterpart to static information are metrics which have a much higher change rate, e.g. host CPU usage or JVM garbage collection activity. Snapshots only contain static information.
+:::
+
+### List the services running on a host
+
+We will now use the Response output from the previous curl command. The **snapshotId** in the response will be used in the next curl command to list services running on a host.
+
+Use the follwoing steps to copy the curl command to the Terminal and update the snapshotId for the host labeled **kube-rs**
+
+1. Copy the snapshotId from the response of the curl command in step 12. 
+   
+   ![](images/copy_snapshotid.png)
+   
+2. Copy the curl command below and paste it to the terminal
+   
+Request:
+
+```json
+ curl -k --silent -X GET -H "authorization: apiToken $apiToken"  "https://$host/api/infrastructure-monitoring/snapshots/<snaphostId>?pretty"
+```
+3. Paste the command to the Send text option in the Bastion host window
+
+![](images/copy_curl_snapshot.png)
+
+
+4. Update the snapshotId in the commend with the snapshotId by removing the **snapshotId** and pasting the coppied id. 
+   
+   ![](images/updated_snapshotId.png)
+
+5. Run the Curl command to list services running on the host kube-rs
+
+
+:::info
+The service routes are listed with their ip, subnet and Fully Qualified Domain Name
+
+![](images/applicaiton_routes.png)
+
+:::
+
+:::info
+The Host information includes filesystem, OS and Machine id. This is typically helpful for mapping host informaiotn with external data sources.
+
+![](images/host_subnets.png)
+
+:::
+
+## 4.4: Summary
+
+At this point, you have used the APIs to fetch both Application and Infrasturcture metrics. 
+
+Instana OpenAPI documentation : https://instana.github.io/openapi/
+
 
 ---
