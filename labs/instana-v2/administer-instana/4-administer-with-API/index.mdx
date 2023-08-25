@@ -8,7 +8,7 @@ sidebar_position: 4
 
 
 In this section of the lab we will create an API Token that will be used for executing the Instana Rest API calls. The Instana web REST API allows for retrieval of data such as traces and metrics, as well as configuration, such as service extraction and user management.
-In order to use the web REST API, you need to create an API token and assign permissions.
+In order to use the web REST API, you need to create an API token and assign permissions. Follwo these steps to create a new API token
 
 
 From the Bastion host open the Firefox browser and select the **Instana**
@@ -33,14 +33,14 @@ You can safely ignore the warning about the certificate being untrusted.
 
 :::
 
-When prompted, enter the username and password from teh credentials file.
+When prompted, enter the username and password from the credentials file.
 
 ![](../3-administer/images/login.png)
 
 
 ## 4.1: Create an Instana API Token
 
-1. Logon to the Instana and select the Settings on the left menu
+1. Select **Settings** on the left menu
 
 >>>![](images/api_1.png)
 
@@ -55,18 +55,18 @@ When prompted, enter the username and password from teh credentials file.
 
 4. In the **Permissions** section enable the following permissions
 
->>> User management\
-Configuration of applications\
-Service & endpoint mapping\
-Configuration of automation actions\
-Execution of automation actions\
-Configuration of alert channels\
-Configuration of Events, Alerts and Smart Alerts\
-Configuration of global custom payload for alerts\
-Configuration of global Smart Alerts\
-Configuration of releases\
-Configuration of agents\
-Website monitoring configuration\
+>>> User management <br/>
+Configuration of applications <br/>
+Service & endpoint mapping <br/>
+Configuration of automation actions <br/>
+Execution of automation actions <br/>
+Configuration of alert channels <br/>
+Configuration of Events, Alerts and Smart Alerts <br/>
+Configuration of global custom payload for alerts <br/>
+Configuration of global Smart Alerts <br/>
+Configuration of releases <br/>
+Configuration of agents <br/>
+Website monitoring configuration <br/>
 
 >>>![](images/api_4.png)
 
@@ -79,15 +79,16 @@ Website monitoring configuration\
 
 >>>![](images/api_6.png)
 
-7. Create a **HOST** and **API_TOKEN** environment variables on the bastion host
+7. Create a **host** and **apiToken** environment variables on the bastion host
 
-    Open the Terminal window on the Bastion host by selecting the Terminal icon on the desktop
+    1. Open the Terminal window on the Bastion host by selecting the Terminal icon on the desktop
 
     ![](images/open-terminal.png)
 
-
-    export host=dev-aiops.apps.ocp.ibm.edu  <br /> 
-    export apiToken=<Token from step #6>
+    2. Copy and paste the follwoign export commands to the terminal window
+   
+        export host=dev-aiops.apps.ocp.ibm.edu  <br /> 
+        export apiToken=<Token from step #6>
 
 
 :::tip
@@ -99,7 +100,7 @@ To copy and paste from teh lab guide to the bastion host window, use the Insert 
 ## 4.2: Application Metrics
 
 
-The API calls will be done in the same terminal Window. Copy and Paste the request curl command to the Terminal window.
+The Application Metrics API calls will be run in the terminal Window. To Run the Curl commands, copy and paste the request curl command to the Terminal window.
 
 ### List all applications
 
@@ -143,7 +144,7 @@ Response:
 
 
 
-### Query application services by application name
+### Query application services by an application name
 
 The request will list all applications monitored by the Instana agent that are throwing http 5xx errors. The nameFilter attribute in the request can be changed to the **qotd** applciaiton.
 
@@ -157,26 +158,30 @@ Response:
 
 ![](images/services_api_response.png)
 
+:::info
+Note, the screenshot does not list the complete set of services and the data may look different in your environment.
+:::
+
 ## 4.3: Infrastructure-level metrics
 
 
-In this section we will use the Instana applciation interface to help build the API calls required to fetch Infrastucture information for an application. 
+In this section we will use the Instana applciation interface to help build the API calls required to fetch Infrastucture information and correlate it to an Applciation. 
 
 
 ### List hosts monitoried by Instana
 
-1. From the Instana applciation, Select the Analytics icon 
+1. From the Instana applciation, Select the Analytics icon
 
 
   ![](images/analytics.png)
 
 
-2. From the drop-down menu, select Infrastructure
+2. Select Infrastructure from the drop-down menu
 
 ![](images/infrastructure.png)
 
 
-3. In the search field, enter Host to filter the results and select the **Host** Entity Type
+3. In the search field, enter **Host** to filter the results and select the **Host** Entity Type
 
 ![](images/host_filter.png)
 
@@ -199,31 +204,35 @@ In this section we will use the Instana applciation interface to help build the 
 
 ![](images/text_editor.png)
 
-8. Make the following changes ot he curl command before running it in the Terminal window
+8. Make the following changes to the curl command before running it in the Terminal window
 
-   1. Add **-k** after the curl command to bypass the SSL certificate
+   1. Add **-k** after the curl command to accept the certificate
    2. Add **?pretty** to make the output more readable
 
 
-9. The final query will look like this:
+9. The final query will look like this
 
 ![](images/curl_api_query.png)
 
-10. Run the Curl command by copying and pasteing it to the Terminal window
+10. Run the Curl command by copying and pasting it to the Terminal window
 
 ![](images/copy_curl.png)
 
-11. Right click on the Terminal window and select **paste*
+11. Right click on the Terminal window and select **paste**
 
 ![](images/paste_curl.png)
 
-12. Run the curl command that will list the hosts
+12.  The API will list hosts monitored by Instana
 
 ![](images/hosts_api.png)
 
+:::info
+A **snapshot** represents static information about an entity as it was at a specific point in time. To clarify: Static information is any information which is seldom changing, e.g. process IDs, host FQDNs or a list of host hard disks. The counterpart to static information are metrics which have a much higher change rate, e.g. host CPU usage or JVM garbage collection activity. Snapshots only contain static information.
+:::
+
 ### List the services running on a host
 
-We will now use the Response Output from the previous curl command. The **snapshotId** in the response will be used in the next curl command to list services running on a host.
+We will now use the Response output from the previous curl command. The **snapshotId** in the response will be used in the next curl command to list services running on a host.
 
 Use the follwoing steps to copy the curl command to the Terminal and update the snapshotId for the host labeled **kube-rs**
 
@@ -238,23 +247,31 @@ Request:
 ```json
  curl -k --silent -X GET -H "authorization: apiToken $apiToken"  "https://$host/api/infrastructure-monitoring/snapshots/<snaphostId>?pretty"
 ```
+3. Paste the command to the Send text option in the Bastion host window
 
 ![](images/copy_curl_snapshot.png)
 
 
-3. Update the snapshotId in the commend with the snapshotId by removing the **snapshotId** and pasting the coppied id. 
+4. Update the snapshotId in the commend with the snapshotId by removing the **snapshotId** and pasting the coppied id. 
    
    ![](images/updated_snapshotId.png)
 
-4. Run the Curl command to list services running on the host kube-rs
+5. Run the Curl command to list services running on the host kube-rs
 
+
+:::info
 The service routes are listed with their ip, subnet and Fully Qualified Domain Name
 
 ![](images/applicaiton_routes.png)
 
+:::
+
+:::info
 The Host information includes filesystem, OS and Machine id. This is typically helpful for mapping host informaiotn with external data sources.
 
 ![](images/host_subnets.png)
+
+:::
 
 ## 4.4: Summary
 
