@@ -18,10 +18,12 @@ bookmark.
 
 If you are unsure how to get access to the Bastion host (Guacamole) see
 [Accessing a Lab Environment](/instana-techxchange/labs/jam-in-a-box/#accessing-a-lab-environment)
-
 :::
 
-![open firefox](../3-administer/images/open-firefox.png)
+
+![open firefox](images/open-firefox.png)
+
+
 
 :::info
 
@@ -31,12 +33,10 @@ You can safely ignore the warning about the certificate being untrusted.
 
 :::
 
-When prompted, enter the username and password that you updated earlier.
-
-- Username: **admin@instana.local**
-- Password: **Passw0rd**
+When prompted, enter the username and password from teh credentials file.
 
 ![](../3-administer/images/login.png)
+
 
 ## 4.1: Create an Instana API Token
 
@@ -81,18 +81,33 @@ Website monitoring configuration\
 
 7. Create a **HOST** and **API_TOKEN** environment variables on the bastion host
 
-    export HOST=192.168.252.60
-    export API_TOKEN=token from step 6
+    Open the Terminal window on the Bastion host by selecting the Terminal icon on the desktop
 
+    ![](images/open-terminal.png)
+
+
+    export HOST=dev-aiops.apps.ocp.ibm.edu  <br /> 
+    export API_TOKEN=<Token from step #6>
+
+
+:::tip
+To copy and paste from teh lab guide to the bastion host window, use the Insert Text icon at the top of the window.
+
+![](images/copy-and-paste.png)
+:::
 
 ## 4.2: Application Metrics
 
+
+The API calls will be done in the same terminal Window. Copy and Paste the request curl command to the Terminal window.
 
 ### List all applications
 
 Request:
 
+```json
  curl -k --silent -X GET -H "authorization: apiToken $API_TOKEN"  "https://$HOST/api/application-monitoring/applications?pretty"
+```
 
 Response:
 
@@ -104,8 +119,8 @@ Response:
     "boundaryScope" : "ALL",
     "entityType" : "APPLICATION",
     "_links" : {
-      "self" : "https://192.168.252.60/api/application-monitoring/applications;id=hov5KXevQMW8cM5wnGqgZw?to=1692667910745&windowSize=600000",
-      "services" : "https://192.168.252.60/api/application-monitoring/applications;id=hov5KXevQMW8cM5wnGqgZw/services?to=1692667910745&windowSize=600000"
+      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications;id=hov5KXevQMW8cM5wnGqgZw?to=1692667910745&windowSize=600000",
+      "services" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications;id=hov5KXevQMW8cM5wnGqgZw/services?to=1692667910745&windowSize=600000"
     }
   }, {
     "id" : "USD9KEU_SWaBbvj6AxubSA",
@@ -113,8 +128,8 @@ Response:
     "boundaryScope" : "ALL",
     "entityType" : "APPLICATION",
     "_links" : {
-      "self" : "https://192.168.252.60/api/application-monitoring/applications;id=USD9KEU_SWaBbvj6AxubSA?to=1692667910745&windowSize=600000",
-      "services" : "https://192.168.252.60/api/application-monitoring/applications;id=USD9KEU_SWaBbvj6AxubSA/services?to=1692667910745&windowSize=600000"
+      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications;id=USD9KEU_SWaBbvj6AxubSA?to=1692667910745&windowSize=600000",
+      "services" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications;id=USD9KEU_SWaBbvj6AxubSA/services?to=1692667910745&windowSize=600000"
     }
   }, {
     "id" : "_8O83anZQW-72LB-HtBECg",
@@ -122,8 +137,8 @@ Response:
     "boundaryScope" : "INBOUND",
     "entityType" : "APPLICATION",
     "_links" : {
-      "self" : "https://192.168.252.60/api/application-monitoring/applications;id=_8O83anZQW-72LB-HtBECg?to=1692667910745&windowSize=600000",
-      "services" : "https://192.168.252.60/api/application-monitoring/applications;id=_8O83anZQW-72LB-HtBECg/services?to=1692667910745&windowSize=600000"
+      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications;id=_8O83anZQW-72LB-HtBECg?to=1692667910745&windowSize=600000",
+      "services" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications;id=_8O83anZQW-72LB-HtBECg/services?to=1692667910745&windowSize=600000"
     }
   } ],
   "page" : 1,
@@ -134,12 +149,14 @@ Response:
     "to" : 1692667910000
   },
   "_links" : {
-    "self" : "https://192.168.252.60/api/application-monitoring/applications?to=1692667910745&windowSize=600000&page=1&pageSize=50"
+    "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications?to=1692667910745&windowSize=600000&page=1&pageSize=50"
   }
 }
 ```
 
 ### List applications with errors
+
+The request will list all applications monitored by the Instana agent that are throwing http 5xx errors. The **metric** attribute in the request object can be changed to http.4xx or http.3xx as needed.
 
 Request:
 
@@ -205,13 +222,66 @@ Response:
 }
 ```
 
-
-Note the above metric request can be replaced by http.4xx or http.3xx http return codes. 
-
-### List applications by host
-
 ### Query application services by application name
 
+The request will list all applications monitored by the Instana agent that are throwing http 5xx errors. The nameFilter attribute in the request can be changed to the **qotd** applciaiton.
+
+Request:
+
+```json
+curl -k --silent -X GET -H "authorization: apiToken $API_TOKEN"  "https://$HOST/api/application-monitoring/applications/services?pretty" -d 'nameFilter=Robot-Shop'
+```
+
+Response:
+
+```json
+{
+  "items" : [ {
+    "id" : "f9c1fe23e71948b618b228e526fb27d761fa7f66",
+    "label" : "zookeeper",
+    "types" : [ ],
+    "technologies" : [ "jvmRuntimePlatform", "zooKeeper" ],
+    "snapshotIds" : [ ],
+    "entityType" : "SERVICE",
+    "_links" : {
+      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=f9c1fe23e71948b618b228e526fb27d761fa7f66?to=1692708030444&windowSize=600000",
+      "endpoints" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=f9c1fe23e71948b618b228e526fb27d761fa7f66/endpoints?to=1692708030444&windowSize=600000"
+    }
+  }, {
+    "id" : "4e014220bc3eebb5e5bcdc244c73a0109296562a",
+    "label" : "yl-public.skillsnetwork.site",
+    "types" : [ "HTTP" ],
+    "technologies" : [ ],
+    "snapshotIds" : [ ],
+    "entityType" : "SERVICE",
+    "_links" : {
+      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=4e014220bc3eebb5e5bcdc244c73a0109296562a?to=1692708030444&windowSize=600000",
+      "endpoints" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=4e014220bc3eebb5e5bcdc244c73a0109296562a/endpoints?to=1692708030444&windowSize=600000"
+    }
+  }, {
+    "id" : "f0fcaa6767a729a923460a0fee7e2710fbd27ba8",
+    "label" : "yl-public-redisha.yl-public.svc.cluster.local:26379",
+    "types" : [ "DATABASE" ],
+    "technologies" : [ "redis" ],
+    "snapshotIds" : [ ],
+    "entityType" : "SERVICE",
+    "_links" : {
+      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=f0fcaa6767a729a923460a0fee7e2710fbd27ba8?to=1692708030444&windowSize=600000",
+      "endpoints" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=f0fcaa6767a729a923460a0fee7e2710fbd27ba8/endpoints?to=1692708030444&windowSize=600000"
+    }
+  }, {
+    "id" : "1b5e8ac09a7837f059a2624a820f7da18c9de6a3",
+    "label" : "yl-public-proxysql.yl-public.svc.cluster.local",
+    "types" : [ "DATABASE" ],
+    "technologies" : [ "mySqlDatabase" ],
+    "snapshotIds" : [ ],
+    "entityType" : "SERVICE",
+    "_links" : {
+      "self" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=1b5e8ac09a7837f059a2624a820f7da18c9de6a3?to=1692708030444&windowSize=600000",
+      "endpoints" : "https://aiops.apps.ocp.ibm.edu/api/application-monitoring/applications/services;id=1b5e8ac09a7837f059a2624a820f7da18c9de6a3/endpoints?to=1692708030444&windowSize=600000"
+    }
+  }
+  ```
 
 ## 4.3: Event Management 
 
