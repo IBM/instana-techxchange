@@ -7,8 +7,7 @@ sidebar_position: 4
 # Administer Instana with API's
 
 
-In this section of the lab we will create an API Token that will be used for executing the Instana Rest API calls. The Instana web REST API allows for retrieval of data such as traces and metrics, as well as configuration, such as service extraction and user management.
-In order to use the web REST API, you need to create an API token and assign permissions. Follwo these steps to create a new API token
+In this section of the lab we will create an Personal API Token that will be used for executing the Instana Rest API calls. The Instana web REST API allows for retrieval of data such as traces and metrics, as well as configuration, such as service extraction and user management.
 
 
 From the Bastion host open the Firefox browser and select the **Instana**
@@ -40,6 +39,8 @@ When prompted, enter the username and password from the credentials file.
 
 ## 4.1: Create an Instana API Token
 
+In this section of the lab we will create an Personal API Token that will be used for executing the Instana Rest API calls. Personal tokens can be created Settings > User settings > Personal API tokens and only require a name to be set. This token "inherits" the permission of the creating user. 
+
 1. Select **Settings** on the left menu
 
 >>>![](images/api_1.png)
@@ -53,24 +54,17 @@ When prompted, enter the username and password from the credentials file.
 
 >>>![](images/api_3.png)
 
-4. In the **Permissions** section enable the following permissions
+4. the following set of **Permissions** are required for executing the API's in this lab.
 
->>> User management <br/>
-Configuration of applications <br/>
+>>>Configuration of applications <br/>
 Service & endpoint mapping <br/>
-Configuration of automation actions <br/>
-Execution of automation actions <br/>
-Configuration of alert channels <br/>
 Configuration of Events, Alerts and Smart Alerts <br/>
 Configuration of global custom payload for alerts <br/>
-Configuration of global Smart Alerts <br/>
-Configuration of releases <br/>
 Configuration of agents <br/>
-Website monitoring configuration <br/>
 
 >>>![](images/api_4.png)
 
-5. Select the **Save** button at the bottom of the page to save the API Token
+1. Select the **Save** button at the bottom of the page to save the API Token
 
 >>>![](images/api_5.png)
 
@@ -90,9 +84,10 @@ Website monitoring configuration <br/>
         export host=dev-aiops.apps.ocp.ibm.edu  <br /> 
         export apiToken=<Token from step #6>
 
+      ![](images/export_tokens.png)
 
 :::tip
-To copy and paste from teh lab guide to the bastion host window, use the Insert Text icon at the top of the window.
+To copy and paste from the lab guide to the bastion host window, use the Insert Text icon at the top of the window. You will be using this method to Copy and Paste Curl commands from the documentation to the Terminal window in the bastion host.
 
 ![](images/copy-and-paste.png)
 :::
@@ -206,8 +201,8 @@ In this section we will use the Instana applciation interface to help build the 
 
 8. Make the following changes to the curl command before running it in the Terminal window
 
-   1. Add **-k** after the curl command to accept the certificate
-   2. Add **?pretty** to make the output more readable
+   1. Add **-k** after the curl command to accept the self-Signed certificate
+   2. Adding **?pretty** will make the output more readable
 
 
 9. The final query will look like this
@@ -273,7 +268,31 @@ The Host information includes filesystem, OS and Machine id. This is typically h
 
 :::
 
-## 4.4: Summary
+## 4.4: Events and Alerts
+
+In this section we will fetch Events from applications monitored by Instana using API's
+
+### Get a list of all OPEN Events opened within the last 20 seconds minutes
+
+The request will list all application Events in the last 20 seconds.
+
+Request:
+
+```json
+curl -k --silent -X GET -H "authorization: apiToken $apiToken"  "https://$host/api/events?windowSize=20000&excludeTriggeredBefore=true&pretty"
+```
+
+Response:
+
+
+![](images/events_20_seconds.png)
+
+
+:::info
+Adjust the windowSize if you do not see any Events returned. For example to view Events that occured in the past 1 minute use 60000 as the value for **windowSize**
+:::
+
+## 4.5: Summary
 
 At this point, you have used the APIs to fetch both Application and Infrasturcture metrics. 
 
