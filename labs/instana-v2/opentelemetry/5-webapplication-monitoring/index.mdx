@@ -36,7 +36,7 @@ Find the string "EUM" (you can use "/EUM" command in your text editor)
 
 Apply the values as described on the below: 
 
-Set the INSTANA_EUM_URL to https://eum.apps.ocp.ibm.com.
+Set the INSTANA_EUM_URL to https://eum.apps.ocp.ibm.edu (no trailing slash!)
 
 Notice that in the yaml, you must add a new line of text with the word "value:" and specify the URL for the value as seen below.
 
@@ -50,7 +50,7 @@ Save the file by entering ":wq"
 
 ## Generate traffic on the OpenTelemetry Demo Application
 
-As described in the chapter 2, please run test traffic through your instance of the OpenTelemetry Demo Application. 
+Go back to your OpenTelemetry Demo Application and refresh the page, then please run test traffic through the page (view products, add to cart, checkout, etc.)
 Thanks to this, Instana will capture the end-to-end traffic starting from the web activity, down to the services and databases level.
 
 View the web traffic in the newly created "website" within the Instana UI.  Feel free to click on some of the tabs and "Analyze Page Loads" button to view the website details.
