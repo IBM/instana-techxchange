@@ -22,14 +22,17 @@ OpenTelemetry is included into Instana license, there's no additional payment re
 ## Enable OpenTelemetry in Instana
 
 Let's edit the configmap of instana-agent. We need to enable the OpenTelemetry settings within the instana-agent.  They are not enabled by default.  
-Note:  It is also possible to enable the Agent OpenTelemetry settings during the Helm Install by providing optional configuration parameters that can be found here:  https://github.com/instana/helm-charts/tree/main/instana-agent
+:::info
+It is also possible to enable the Agent OpenTelemetry settings during the Helm Install by providing optional configuration parameters that can be found here: https://github.com/instana/helm-charts/tree/main/instana-agent
+:::
 
 Before editing the configmap, let's copy the content that needs to be added into your buffer.
 
-In the terminal window, type "ls instana*".  You will see a file named "instana-config-map.txt" as seen below.
+In the terminal window, type "ls instana*".  You will see a file named "instana-config-map.txt" as seen below. The file is located in the /root folder
 ```sh
+cd /root
 ls instana*
-instana-config-map.txt"
+instana-config-map.txt
 ```
 
 Next, cat the file to view the content that needs to be added to the configmap.
@@ -114,7 +117,7 @@ deployment.apps/my-otel-demo-shippingservice restarted
 
 ## Verify OpenTelemetry Demo Application
 
-Once the instana-agent and OpenTelemetry Demo Application were restarted, it is now time to Verify
+Once the instana-agent and OpenTelemetry Demo Application were restarted, it is now time to verify
 if the applications works and delivers metrics as expected.
 
 Your instance of OpenTelemetry Demo Application is available under the https://otel-demo.ocp.ibm.edu/
@@ -125,7 +128,9 @@ Also, do not worry about the security message - accept the self-signed certifica
 
 Exercise the application to ensure it is working properly.
 
-Note: The OpenTelemetry Demo Application has an automated load running that will generate monitored transactions within Instana.
+:::info
+The OpenTelemetry Demo Application has an automated load running that will generate monitored transactions within Instana.
+:::
 
 ## Create an Application in Instana
 
