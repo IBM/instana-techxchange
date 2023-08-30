@@ -118,7 +118,6 @@ Click on the **Add Group** button. Then, type **database statement** in the filt
 This will group all of the Database statements by unique SQL statements. You can then sort these statements by latency, erroneous calls, etc.
 
 
-
 ![explore application 38](images/explore_application_38.jpg)
 
 Note: You also have the option **select metrics** to choose the metrics that you want to see on the screen. For example, change latency from Average to 95th percentile.
