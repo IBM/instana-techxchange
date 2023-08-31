@@ -21,14 +21,19 @@ OpenTelemetry is included into Instana license, there's no additional payment re
 
 ## Enable OpenTelemetry in Instana
 
-Let's edit the configmap of instana-agent. We need to enable the OpenTelemetry settings within the instana-agent.  They are not enabled by default.  
+Let's edit the configmap of instana-agent. We need to enable the OpenTelemetry settings within the instana-agent. They are not enabled by default.  
 :::info
 It is also possible to enable the Agent OpenTelemetry settings during the Helm Install by providing optional configuration parameters that can be found here: https://github.com/instana/helm-charts/tree/main/instana-agent
 :::
 
 Before editing the configmap, let's copy the content that needs to be added into your buffer.
 
-In the terminal window, type "ls instana*".  You will see a file named "instana-config-map.txt" as seen below. The file is located in the /root folder
+Login to you Kubernetes cluster 
+```sh
+ssh root@10.100.1.60
+```
+
+In the terminal window, ensure your in the right directory (/root) and type "ls instana*".  You will see a file named "instana-config-map.txt" as seen below. The file is located in the /root folder
 ```sh
 cd /root
 ls instana*
@@ -47,10 +52,10 @@ Highlight all of the text and then right-click and select "Copy" as shown below.
 
 ![configmap](images/selectText.png)
 
-Next, edit the configmap by typing the command shown below.   Do NOT copy/paste this command or you will lose the configmap content from your clipboard.
+Next, edit the configmap by typing the command shown below. Do NOT copy/paste this command or you will lose the configmap content from your clipboard.
 
 ```sh
-kubectl edit configmap --namespace instana-agent 
+kubectl edit configmap instana-agent --namespace instana-agent 
 ```
 
 Within the configmap, move your mouse directly below the configuration.yaml line as seen below.
@@ -68,6 +73,11 @@ Finally, right-click and select "Paste" to paste the additional text into the co
 The final structure of the configmap should look like the below example
 
 ![configmap](images/cmResults.png)
+
+:::warning
+Please make sure the indentations are exactly as shown above. YAML file format is very sensitive when it comes to the white characters. Your input should look exactly like above.
+:::
+
 
 Save the file by typing ":wq" 
 
