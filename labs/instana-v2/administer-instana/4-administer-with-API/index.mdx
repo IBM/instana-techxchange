@@ -272,7 +272,7 @@ The Host information includes filesystem, OS and Machine id. This is typically h
 
 In this section we will fetch Events from applications monitored by Instana using API's
 
-### Get a list of all OPEN Events opened within the last 20 seconds minutes
+### Get a list of all Open Events opened within the last 20 seconds minutes
 
 The request will list all application Events in the last 20 seconds.
 
@@ -292,9 +292,75 @@ Response:
 Adjust the windowSize if you do not see any Events returned. For example to view Events that occured in the past 1 minute use 60000 as the value for **windowSize**
 :::
 
+
+### Create a new Custom Event
+
+In this section we will use an API to create a new Custom Event and verify it in the Instana user interface. <br />
+
+:::info
+Here is a description of a few of the attributes in the request <br />
+**id** : The unique name of the custom event. Note this value is the same as the value in the PUT request URL. The name of the event we have used is **robotshopcpu** <br />
+**name** : The name of the Event. In thsi example we named the Event **Lab_Event1** <br />
+**query** : The dynamic query that spefifies the name of the applicaiton. In this example the application name is **Robot-Shop**  <br />
+**rules** : The rules that will trigger the event. In this example, the event will trigger when the host CPU is greater than or equal to **90%** <br />
+:::
+
+Request:
+
+```json
+ curl -k -X PUT  -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: apiToken $apiToken" \
+  "https://$host/api/events/settings/beta/event-specifications/custom/robotshopcpu" \
+  -d '
+{
+    "id": "robotshopcpu",
+    "name": "Lab_Event1",
+    "entityType": "host",
+    "query": "entity.application.name:Robot-Shop",
+    "triggering": true,
+    "description": "Monitor System Host CPU",
+    "expirationTime": "5000",
+    "enabled": true,
+    "rules": [
+        {
+            "ruleType": "threshold",
+            "metricName": "cpu.sys",
+            "metricPattern": null,
+            "rollup": 0,
+            "window": 5000,
+            "aggregation": "avg",
+            "conditionOperator": ">=",
+            "conditionValue": 0.9,
+            "severity": 10
+        }
+    ],
+    "actions": []
+}'
+```
+Response:
+
+
+![](images/custom_event.png)
+
+
+Use the following steps to verify the event has been created in the Instana application
+
+1. Select the **Settings** icon on the left navigation
+
+![](images/select_settings.png)
+
+2. Select **Events** from the menu and enter the Event name specified in the request **Lab_**
+
+![](images/custom_lab_event.png)
+
+3. Select the event to view the event configuration
+
+![](images/custom_lab_event_view.png)
+
 ## 4.5: Summary
 
-At this point, you have used the APIs to fetch both Application and Infrasturcture metrics. 
+At this point, you have used the API's to perform various tasks such as monitoring applciation metrics, getting a list of Events and creating new Events. API's are helpful when automating tasks such as migrating configuration between environments or exporting metrics data to external systems.
+
+Reference Link:
 
 Instana OpenAPI documentation : https://instana.github.io/openapi/
 
