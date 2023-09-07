@@ -6,7 +6,7 @@ sidebar_position: 4
 
 # Administer Instana
 
-From the Bastion host open the Firefox browser and select the **Instana**
+From the Student host system open the Firefox browser and select the **Instana**
 bookmark.
 
 :::tip
@@ -26,10 +26,8 @@ You can safely ignore the warning about the certificate being untrusted.
 
 :::
 
-When prompted, enter the username and password that you updated earlier.
+When prompted, enter the username and password from the credentials file.
 
-- Username: **admin@instana.local**
-- Password: **Passw0rd**
 
 ![](images/login.png)
 
@@ -54,7 +52,7 @@ The screen will change to show the **Alert Channels**. Since this is a new
 install of Instana, there are no Alert Channels defined.
 
 In the upper right portion of the screen, click on the **Add Alert Channel**
-dropdown and select **Email**
+dropdown and select **Generic Webhook**
 
 :::tip
 
@@ -65,42 +63,47 @@ Webhooks.
 
 :::
 
-![](images/email.png)
+![](images/webhook.png)
 
-After selecting **Email** the screen will change to show the fields required to
-configure the **Email** **Alert Channel**. An Alert Channel can be setup to
+
+After selecting  **Generic Webhook**  the screen will change to show the fields required to
+configure the **Generic Webhook** Alert Channel. An Alert Channel can be setup to
 notify specific users or to notify a large groups of users. For example, you
-might want all database related Events to be sent to a _database team email
+might want all database related Events to be sent to a _database team webhook
 alias_ for the DBAs. Or, you might want to notify a specific line of business or
 the IT Operations team.
 
-Here are the steps for setting up the **Email** channel.
+Here are the steps for setting up the **Generic Webhook** channel.
 
 - Enter a name for the alert. The name can be anything, but should be
   meaningful. For example, if the Alert Channel will be used to notify the MQ
   admins, like in this case call it something MQ related such as
-  `MQ Email Channel`
-- Enter the email address to notify. Notice that there is an **Add Email** link
-  on the right side if you want to add multiple Email addresses. For the lab
-  purpose, please use `jammer@localhost` email - Instana will be able to send
-  email to your localhost email server
+  `MQ Webhook Channel`
 
-![](images/003-administer_instana.png)
+  ![](images/newAlertChannel.png)
 
-Next, click the **Test Channel** button. This will attempt to send a test Email
-to the address you specified. You'll see whether the Instana server has access
-to the Email destination.
+- We will use the https://webhook.site link to create a generic webhook. Open 
+  a new tab on the browser and enter the url https://webhook.site. Copy the Webhook 
+  URL in the **Your Unique URL** field
 
-Check for the test email on the Instana server. Login to the Instana server in a
-new Terminal tab using `ssh jammer@instana`. Once logged in use the `mail`
-command as presented below to view the jammer users inbox:
+  ![](images/webhooksite.png)
 
-![](images/test-mail-instana.png)
+- Enter the URL in the Webhook URL field in the Instana Alert Channel configuration page
+  and select **Test Channel** 
 
-This will show one email received from **server@instana.com** to the
-**jammer@localhost** email box.
+  ![](images/webhookInstanaTest.png)
 
-Type **exit** to exit the mail prompt.
+  :::tip
+
+  If you see a connectivity error, retry the test
+
+  :::
+
+
+- Verify a test Webhook message is sent on the webhook.site page
+
+  ![](images/webhooksite_test.png)
+
 
 After successfully testing the Alert Channel, click the **Create** button to
 save the **Alert Channel**
