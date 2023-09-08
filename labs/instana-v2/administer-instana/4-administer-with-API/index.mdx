@@ -10,18 +10,17 @@ sidebar_position: 4
 In this section of the lab we will create an Personal API Token that will be used for executing the Instana Rest API calls. The Instana web REST API allows for retrieval of data such as traces and metrics, as well as configuration, such as service extraction and user management.
 
 
-From the Bastion host open the Firefox browser and select the **Instana**
+From the Student host open the Firefox browser and select the **Instana**
 bookmark.
 
 :::tip
 
-If you are unsure how to get access to the Bastion host (Guacamole) see
+If you are unsure how to get access to the Student host see
 [Accessing a Lab Environment](/instana-techxchange/labs/jam-in-a-box/#accessing-a-lab-environment)
 :::
 
 
 ![open firefox](images/open-firefox.png)
-
 
 
 :::info
@@ -229,12 +228,12 @@ A **snapshot** represents static information about an entity as it was at a spec
 
 We will now use the Response output from the previous curl command. The **snapshotId** in the response will be used in the next curl command to list services running on a host.
 
-Use the follwoing steps to copy the curl command to the Terminal and update the snapshotId for the host labeled **kube-rs**
+Use the follwoing steps to copy the snapshotId for one of the hosts, for example **infra.ocp.ibm.edus**
 
 1. Copy the snapshotId from the response of the curl command in step 12. 
    
    ![](images/copy_snapshotid.png)
-   
+
 2. Copy the curl command below and paste it to the terminal
    
 Request:
@@ -251,7 +250,7 @@ Request:
    
    ![](images/updated_snapshotId.png)
 
-5. Run the Curl command to list services running on the host kube-rs
+5. Run the Curl command to list services running on the host
 
 
 :::info
