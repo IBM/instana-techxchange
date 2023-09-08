@@ -19,7 +19,7 @@ There are four Instana labs:
   - Create Application Perspectives for demo applications.
   - Learn about the different monitoring views, such as; Applications,
     Infrastructure, Websites & Mobile Apps and how to use them.
-- [**Administer Instana**](../administer-instana/1-introduction/index.mdx)
+- [**Administer Instana**](../administer-instana/3-administer/index.mdx)
   - Learn about the different alerting options in Instana; set up Alert
     Channels, Smart Alerts and events.
 
