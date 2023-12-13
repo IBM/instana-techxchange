@@ -1,0 +1,68 @@
+---
+title: 5. Smart Alert
+description: Welcome to the Synthetic Monitoring and Action Catalog lab
+sidebar_position: 50
+---
+
+# Smart alert
+
+## Create smart Alert for test
+
+Smart Alerts allow you to identify a threshold violation.   Then, if desired, Alert people via external systems like Watson AIOps or Email, Slack, Service Now, etc. in Instana the notification mechanism is called an **Alert Channel** 
+
+3.1 Click "Synthetic Monitoring" -> "Add"
+![](images/smartAlert.png)
+
+Then, select "ADD SYNTHETIC SMART ALERT":
+![](images/addSmartAlert.png)
+
+Click "Add Synthetic Test"
+![](images/selectSyntheticTest.png)
+
+Find the test you created earlier and select the **checkbox**.  Then, click **Add 1 Test**
+
+![](images/selectTest.png)
+
+Click **Next** to go to the next screen on the dialog.
+
+![](images/SA_Step1.png)
+
+Click "Next"
+
+3.2 You may optionally add filters for monitored what is being monitored. In this case, we will not be adding any filters.  Simply click "Next".
+
+![](images/optionalFilter.png)
+
+
+3.3 We choose 1 consecutive occurrence to fire an alert, click Next:
+
+![](images/SA_Step3.png)
+
+3.4 In the next step, we will be selecting an Alert Channel.  Alert Channels allow you to notify people and teams various **channels** such as email, slack, ServiceNow, etc.
+
+Select "Select Alert Channels", "Create Alert Channel" to create new channel, then populate name of the channel and the list of email addresses (we will not send emails to real addresses, so just populate the field with any email address):
+![](images/SA_Step4_CreateChannel.png)
+
+Then, click "Create Alert Channel", click "Cancel" to finish channel creation procedure.
+
+Select created channel and click "Add 1 Channel":
+
+![](images/SA_Step4_AddChannel.png)
+
+And click "Next":
+
+![](images/SA_Step4_AlertChannels.png)
+
+3.5 Configure the alert that will be visible when the threshold violated. Set meaningful values for Title, Alert Level and Description, then click "Create" button:
+
+![](images/SA_Step5.png)
+
+Refresh page to have the alert appeared:
+
+![](images/ConfiguredAlert.png)
+
+Check Events appeared:
+
+![](images/Events.png)
+
+When new Events trigger on the synthetic test, an e-mail will be sent out via the **Alert Channel** notifying the people of the failure.
