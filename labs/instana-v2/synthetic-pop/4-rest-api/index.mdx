@@ -103,14 +103,14 @@ Click "Save" at the bottom of the page.
 - First, we will check if Instana backend as a target application returns success code of **200**
 - Next, the script will check the number of currently reporting agents and confirm that it is less than a threshold.
 
-2.3.1 Right click on "Synthetic Monitoring" and open it in a new browser tab:
+Right click on "Synthetic Monitoring" and open it in a new browser tab:
 ![](images/SyntheticsInANewTab.png)
 
-2.3.2 To create synthetic test switch to just created browser tab with "Synthetic Monitoring" and click "+ ADD" button on the right bottom corner:
+To create synthetic test switch to just created browser tab with "Synthetic Monitoring" and click "+ ADD" button on the right bottom corner:
 
 ![](images/AddSynthetic.png)
 
-2.3.3 Choose "Add Synthetic Test"
+Choose "Add Synthetic Test"
 
 Select "Script API" and click "Next" button:
 
@@ -182,36 +182,35 @@ As follows:
 
 ![](images/Create_Synthetic_Test.png)
 
-2.3.5 For the test we need the Instana token that we created on previous step.  If you didn't save the API Token, you can use the following steps to retrieve the token.
+For the test we need the Instana token that we created on previous step.  If you didn't save the API Token, you can use the following steps to retrieve the token.
    - Switch to previous browser tab with Tokens: ![](images/TokenEye.png)
    - Click on eye on the right from the token and copy text.
    - Switch back to browser tab with script
    - Paste Token as value for TOKEN variable (line 9 on screenshot above)
 
-2.3.6 Instana will run the script from previously installed Synthetic Point of Presence, they can be placed at multiple locations across available infrastructure. The one we will use is deployed on the same cluster with Instana, it may have different name. Select it for our test.
+Instana will run the script from previously installed Synthetic Point of Presence, they can be placed at multiple locations across available infrastructure. The one we will use is deployed on the same cluster with Instana, it may have different name. Select it for our test.
    
 Click Next
 
-
-2.3.7 Adjust time slider to run test every minute:
+Adjust time slider to run test every minute:
 ![](images/TimeSlider.png)
 
 and click "Next" button.
 
 
-2.3.8 Give the test meaningful name and description:
+Give the test meaningful name and description:
 ![](images/CreateSynthTest.png)
 
 At the dialog under "Select an Application" you may specify the list of existing applications for which the test is relevant. The result of the test will appear at the "Synthetic Monitoring" tab of the Application dashboard and you will be able to filter tests by application on Synthetic Monitoring dashboard.
 
 Click "Create" button.
 
-2.3.9 It may take up to minute for Instana to perform the first test and show the line with results. You can refresh browser window and changing time duration for the dashboard on right top of the window to speed up the line to appear before the results of first test will be processed.
+It may take up to minute for Instana to perform the first test and show the line with results. You can refresh browser window and changing time duration for the dashboard on right top of the window to speed up the line to appear before the results of first test will be processed.
 
 By now you should see a list of tests:
 ![](images/ListOfTests.png)
 
-2.3.10 Click on the test name to access the dashboard of the synthetic test:
+Click on the test name to access the dashboard of the synthetic test:
 
 ![](images/SyntheticTestDashboard.png)
 
@@ -219,7 +218,7 @@ At the moment we have 2 agents reporting to the backend.  In the javascript, the
 
 Next let's adjust threshold of the assert hostCount so that it fails if there are more than 1 host connected.
 
-2.3.11 Now, let's edit the synthetic test and adjust the `assert.ok(bodyObj.hostCount < 2,` to cause the test to fail as shown below:
+Now, let's edit the synthetic test and adjust the `assert.ok(bodyObj.hostCount < 2,` to cause the test to fail as shown below:
 
 ```javascript
 ...
