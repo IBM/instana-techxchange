@@ -48,10 +48,10 @@ helm install synthetic-pop \
 	--repo "https://agents.instana.io/helm" \
 	--namespace <namespace> \
 	--create-namespace \
-	--set downloadKey="xxx" \
+	--set downloadKey="<xxx>" \
 	--set controller.location="<yourLocationName>;<yourLocationDisplayName>;<yourLocationCountry>;<yourLocationCity>;0;0;<yourLocationDescription>" \
 	--set controller.clusterName="<yourClusterName>" \
-	--set controller.instanaKey="xxx" \
+	--set controller.instanaKey="4I720vhbzfjAnNS4cuKnNl" \
 	--set controller.instanaSyntheticEndpoint="https://xxx" \
 	--set redis.tls.enabled=false \
 	--set redis.password="<yourPassword>" \
@@ -63,6 +63,7 @@ For Synthetic Point of Presence we need to modify some of the parameters and pro
 
 - Modify the **controller.clusterName** parameter and provide a meaningful name.
 - In the **controller.location**, specify a name, display name, country, etc. for your "Point of Presence".   The "0;0" parameter represents the longituded and latitude of the "Point of Presence".  These parameters help identify the Point of Presence when  there multiples deployed.
+- In the 	**controller.instanaKey**, please specify exactly this value "4I720vhbzfjAnNS4cuKnNl". This is related to the known issue with Instana backend version we are using for this lab. In the real-life scenario, the proper download and Instana key will be populated on the Instana UI.
 - Finally, enter a redis password.  This can be any value since you are setting the password.
 
 :::note
@@ -76,7 +77,7 @@ helm install synthetic-pop \
      --repo https://agents.instana.io/helm  \
      --namespace instana-synthetic \
      --create-namespace \
-     --set downloadKey="xxx" \
+     --set downloadKey="<xxx>" \
      --set controller.location="Local;on Instana cluster;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
      --set controller.instanaKey="xxx" \
      --set controller.clusterName="MyInstanaCluster" \
@@ -86,7 +87,7 @@ helm install synthetic-pop \
      synthetic-pop
 ```
 
-Copy the helm command from the text file and paste it into a terminal window on the Bastion node.  This will execute the helm chart.
+Copy the helm command from the text file and paste it into a terminal window on the Bastion node. This will execute the helm chart.
 
 You should see an output similar to the following:
 
@@ -97,7 +98,7 @@ You should see an output similar to the following:
 >     --create-namespace \
 >     --set downloadKey="xxx" \
 >     --set controller.location="Local;on Instana cluster;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
->     --set controller.instanaKey="xxx" \
+>     --set controller.instanaKey="4I720vhbzfjAnNS4cuKnNl" \
 >     --set controller.clusterName="MyInstanaCluster" \
 >     --set controller.instanaSyntheticEndpoint="https://xxx/synthetics" \
 >     --set redis.tls.enabled=false \
@@ -120,8 +121,18 @@ kubectl get pods --namespace=instana-synthetic
 
 Expected results should look similar to the below:
 
-```sh
-
-```
+![](images/pop-syn-pods.png)
 
 Confirm that the pods are all running.
+
+The last step is to adjust the internal hosts configuration of the Instana Synthetic PoP. This has to be done because of later need to run a script which will make a call to the Instana API.
+
+Please apply the below command
+
+```sh
+kubectl patch deployment synthetic-pop-javascript-playback-engine -n instana-synthetic --patch '{"spec": {"template": {"spec": {"hostAliases": [{"hostnames": ["unit0-tenant0.rhserv.ibm.edu"],"ip": "10.100.1.203"}]}}}}'
+```
+
+After a few minutes, the list of pods should look like the below
+
+![](images/pop-syn-pods.png)

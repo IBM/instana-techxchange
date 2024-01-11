@@ -7,6 +7,7 @@ sidebar_position: 60
 # Action Catalog
 
 Instana recently added a capability called the **Action Catalog**.  The **Action Catalog** allows you to execute corrective actions in order to solve problems in an automated way.  
+
 The approach allows you to reduce downtime by fixing known issues as quickly as possible. There is no need to leave the Instana user interface. In the near future, you will also be able to have those 
 automated actions execute automatically whenever specific Events trigger.
 
@@ -90,10 +91,8 @@ vi /opt/instana/agent/etc/instana/configuration.yaml
 Enable Actions plugin by adding the following config block in the end of the file:
 ```yml
 # Action Catalog
-com.instana.plugin.action:
-  enable: true    # by default is false
 com.instana.plugin.action.script:
-  enable: true    # by default is false
+  enabled: true    # by default is false
   scriptExecutionHome: /tmp
   runAs: mqm
 ```

@@ -74,7 +74,7 @@ Since we will be using the Instana REST APIs to test the availability of Instana
 API Tokens are a part of authentication and authorization mechanism, that allows access to certain kinds of data. 
 We will create a basic token since the APIs we are planning to use do not require special permissions.
 
-Create token by selecting "Settings" -> "Team Settings" -> "API Token" -> "Add API Token":
+Create token by selecting "Settings" -> "Team Settings" -> "API Token" -> "New API Token":
 
 ![](images/CreateAPIToken.png)
 
@@ -134,32 +134,14 @@ Paste the script into a field as shown below:
 var assert=require('assert');
 
 // Address that Synthetic PoP will use to access target host to interrogate:
-var INSTANA_ADDR = 'https://dev-aiops.apps.ocp.ibm.edu';
+var INSTANA_ADDR = 'https://unit0-tenant0.rhserv.ibm.edu';
 
 // Target system token that allows to serve the request (As soon as we
 // interrogate Instana backend, it is Instana token):
-var TOKEN = "0GKMs6mpSXqK9WMByM5lbg";
+var TOKEN = "xxxxxx";
 
 // ======================================================================
 // First call
-// create Object option with details of request including URI and header:
-var options = {
-    uri: INSTANA_ADDR+'/api/instana/health',
-    strictSSL: false,
-    headers: {
-                   'Content-type': 'application/json',
-                   'Authorization': 'apiToken ' + TOKEN
-           }
-};
-
-// Send request and check if the response code is 200
-$http.get(options, function(error, response, body) {
-    var bodyObj = JSON.parse(body);
-    assert.ok(response.statusCode==200, "GET status should be 200. Instead it's " + response.statusCode);
-});
-
-// ======================================================================
-// Second call
 // create Object option with details of request including URI and header:
 var options = {
     uri: INSTANA_ADDR+'/api/infrastructure-monitoring/monitoring-state',
@@ -176,7 +158,7 @@ $http.get(options, function(error, response, body) {
 });
 ```
 
-In the javascript, you will need to replace the API Token shown above (0GKMs6mpSXqK9WMByM5lbg) with the API Token you generated earlier.
+In the javascript, you will need to replace the API Token shown above (xxxxxx) with the API Token you generated earlier.
 
 As follows:
 
