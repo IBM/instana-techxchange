@@ -1,0 +1,21 @@
+---
+title: 1. Introduction
+description: Welcome to the Synthetic Monitoring and Action Catalog lab
+sidebar_position: 10
+---
+
+# Synthetic Monitoring and Action Catalog
+
+This lab focuses on two new Instana features.  The first is synthetic monitoring.  The second is the Action Catalog where you can create and execute automated corrective actions.
+Key capabilities that will be exercised are:
+- Setting up the synthetic "Point of Presence"  This is the component that executes the synthetic test.
+- Single REST API synthetic test
+- Using javascript to execute a scripted synthetic test that exercises multiple REST calls
+- Setup Smart Alerts against synthetic tests
+- Create and execute "Actions" via the Action Catalog
+
+Before we can create any synthetic tests, we must first setup a synthetic "Point of Presence" or "PoP server" to playback our synethetic tests.
+Many customers deploy two or more "Points of Presence" so that they can compare the response time and availability from different network zones.
+For example, if a PoP server running in the LAN network performs well, but a PoP server located on a WAN network is performing poorly, it is clear indication that the problem is the network or load balancer rather than the application.
+
+In the lab, we will begin by installing the "Synethetic Point of Presence".
