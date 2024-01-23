@@ -16,6 +16,8 @@ In this section of the lab, you will learn how Instana can help you get to root 
 
 In order for the events to show as incident, you have to create a **smart alert** which are already created in the **"Quote of the day"** application. 
 
+
+
 On the left side, select **“Applications”** and then click on the **"Quote of the day"** link. 
 
 ![applications](images/applications.png)
@@ -51,7 +53,7 @@ https://ibm.github.io/instana-techxchange/labs/instana-v2/administer-instana/adm
 
 ## Evaluate the Events via an Incident
 
-** The problmes are generated / simulated  in the lab environment once per hour. Therefore you need to change the time interval to "Last Hour" or greater  to view the problems/ incidents triggered by the smart alert setup  **
+** The problems are generated / simulated  in the lab environment once per hour. Therefore you need to change the time interval to "Last Hour" or greater  to view the problems/ incidents triggered by the smart alert setup  **
 
 
 On the left side, select **“Events”**
@@ -255,7 +257,7 @@ Lastly you can see the log message which the simulation injected.
 ## Summary
 In this lab, you learned how to diagnose a problem in Instana, determining that the queue was full and preventing transactions from completing.
 
-Also successfully in this lab, you learnt how to successfully troubleshoot some other common issues by simulating failures.
+Also successfully in this lab, you learned how to successfully troubleshoot some other common issues by simulating failures.
 
 
 Continue to next Lab of **"End User Monitoring(EUM) / Real-User Monitoring(RUM)"**
