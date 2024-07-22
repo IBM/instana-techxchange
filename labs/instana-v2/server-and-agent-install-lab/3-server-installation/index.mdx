@@ -1,5 +1,5 @@
 ---
-title: 3. Instana Server Installation
+title: 3. Instana Server Installation (Standard Edition)
 description:
   How to install the Instana Server on a single server Self-Hosted configuration
 sidebar_position: 4
@@ -9,538 +9,401 @@ sidebar_position: 4
 
 ## 3.1: Introduction
 
-Instana backend is available as SaaS (preferred option) or self hosted (aka
+Instana refers to their on-premises deployment as **self-hosted** and the Instana Server as the **Instana backend**.
+Throughout this document, if you see **Instana Server**, we are referring to the **self-hosted Instana backend**.
+
+Instana server is available as SaaS (preferred option) or self hosted (aka
 on-prem). For on-premises installations, Instana offers multiple options:
 
-- **Single Server** self-hosted is a _Containerized_ deployment that does not
-  support multi-tenancy. Self-Hosted is what Instana calls its on-premises
-  deployments. Of course, on-premises could be deployed into a public cloud, but
-  is not a recommended approach.
-- **Two server** _Containerized_ self-hosted configuration with the datastores
-  on one server and the other components on another. This option is also
-  single-tenant.
-- **Kubernetes deployment** with the cloud native backend components running in
+
+- **Standard Edition** is a _containerized_ self-hosted deployment that can be deployed 
+on a single server configuration or a 3 server configuration. Self-Hosted is what Instana calls its on-premises deployments.
+Under the covers, Standard Edition uses K3S kubernetes. But, nearly all of the kubernetes complexity is managed for
+our customers via the use of the _stanctl_ command.   This option is the perferred self-hosted
+deployment for small and medium sized deployments.  Standard Edition is a multi-tenant solution
+that supports all recent Instana enhancements.
+- **Custom Edition** with the cloud native backend components running in
   a kubernetes cluster and the datastores running either distributed across
-  multiple servers or in the kubernetes cluster also. This configuration is
-  multi-tenant. For assistance with architecture/planning, contact the SWAT team
+  multiple servers or in the kubernetes cluster. This configuration is
+  multi-tenant and intended for large scale deployments and for customers looking for a fully 
+  resilient deployment with data replicated to multiple servers. For assistance with architecture/planning, contact the SWAT team
   or open a [SWAT Request](http://ibm.biz/automation-swat) request (IBM
-  internal).
+  internal) or contact your IBM sales representative.
+- **Docker** self-hosted is a _Containerized_ deployment that does not
+  support multi-tenancy. Of course, on-premises could be deployed into a public cloud. 
+  The Docker deployment offers both a single server and a 2 server configuration. 
+  This option is no longer strategic and lacks a few key capabilities including
+  logging, synthetics, and the Automation catalog.
 
 :::tip
 
 On-premises (self-hosted) releases are delivered every 4 weeks. The release have
-odd numbers such as 225, 227, 229, etc. When upgrading, you may upgrade from N-1
-or N-2, but you can't skip more than one release. So, you can upgrade from 225
-to 229, but not to 231. Even numbered releases are for SaaS only. SaaS is
+odd numbers such as 263, 265, 267, etc. When upgrading, you may upgrade from N-1
+or N-2, but you can't skip more than one release. So, you can upgrade from 265
+to 267 or 269, but not to 271. Even numbered releases are for SaaS only. SaaS is
 upgraded every 2 weeks.
 
 :::
 
 For the installation of the Instana server, we'll be following the instructions
-from the Instana documentation for a **Self-Hosted Instana backend on Docker**.
+from the Instana documentation for **Installing Standard Edition**.
 The instructions can be found
-[here](https://www.ibm.com/docs/en/instana-observability/current?topic=instana-self-hosted-backend-docker-premises)
+[here](https://www.ibm.com/docs/en/instana-observability/current?topic=backend-installing-standard-edition)
 for your reference, but you can follow the steps below. You will be performing
-an online installation during this Tech Jam, but Instana does support off-line
-(air-gapped) installs.
+an air-gapped installation during TechXchange, but Instana does support on-line installs.
 
-This _Self-Hosted Instana backend on Docker_ is Instana's smallest on-premises
-installation option. Production and larger deployments are installed into
-kubernetes for horizontal scale and resiliency. The installation of Instana will
+_Standard Edition_ is one of Instana's smallest on-premises
+installation options and can be configured for POCs and small/medium sized production environments.
+Standard Edition does offer a 3 server configuration for increased scalability, but does not match the scalability
+and resiliency of a full _Custom Edition_ kubernetes based deployment.  The installation of Instana will
 be completed on the VM **instana**.
 
-![install instana architecture](images/architecture.png)
+![install instana architecture](images/labEnvironment.png)
 
 ## 3.2: Prerequisites
 
 Instana requires a Linux server with 16 cores, 64 Gig of RAM and few hundred Gig
-of disk space for a POC sized deployment. It also requires fast backend storage.
+of disk space for a POC sized deployment.  However, if you want to enable some of the optional _feature flags_ 
+such as **logging**, **synthethics**, or the **Automation catalog**, you will need additional vCPUs and memory.  
+
+
+If the optional features are required, see the additional vCPU and memory requirements documented 
+[here](https://www.ibm.com/docs/en/instana-observability/current?topic=cluster-system-requirements#cpu-and-memory-requirements).   
+
+
+It also requires fast backend storage.
 For environments with even a few hundred servers, you'll need 6000 IOPS or more.
 For larger deployments, you'll need more capacity. Several different versions of
-Linux are supported. We have chosen Ubuntu 22.04 for this environment.
+Linux are supported. We have chosen Red Hat 9 for this environment.
 
 :::info
 
 Normally, you would need to ensure that the virtual machine has the correct
 ports opened in the firewall for the agent, UI, and EUM communications. We have
 already done this work for you. For reference,
-[here are the ports](https://www.ibm.com/docs/en/instana-observability/current?topic=premises-installing-instana-backend-docker#network-security-notes)
+[here](https://www.ibm.com/docs/en/instana-observability/current?topic=cluster-system-requirements#networking-requirements) are the ports.
 that need to be opened for the Instana Server for an on-prem deployment. The
-ports for SaaS are slightly different.
+The ports for SaaS, Docker, and Custom Edition are slightly different.
+
+:::Access the Lab Environment
+
+You are now ready to access the lab environment.  All work will be done from the **student** virtual machine.
+
+
+Click on the **student** virtual machine to open the desktop on the **student** VM.
+
+![student-vm](images/studentVM.png)
+
+Next, double click on the **Terminal** icon within the Linux desktop to launch a terminal window.
+
+![terminal](images/desktop.png)
+
+Next, ssh to the Instana server VM from within the terminal window.
+
+```sh
+ssh root@instana
+```
+
+When prompted, enter "Passw0rd" to specify the root password on the Instana server.  The password contains an upper case "P" and a "zero" instead of the letter "O".
+
+You should now be logged into the Instana server virtual machine as the root user.
+
+
+
+Prior to installing Instana, there are a number of prerequisites that need to be in place.  For this lab, we have already
+setup the prerequisites, but it is important that we review them here.  For reference, the requirements are documented [here](https://www.ibm.com/docs/en/instana-observability/current?topic=cluster-system-requirements).  
+Key prereqs are:
+* Filesystems must be setup properly on the server.  Key requirements are:
+    * Approximately 60 Gig of space in the /var filesystem to store the container images that will be used for Instana.
+    * Approximately 40 Gig of space in the /home directory.
+    * Four large filesystems to store the data.  In your lab enviroment, you will see the following 4 directories:
+     (/mnt/instana/stanctl/analytics, /mnt/instana/stanctl/data, /mnt/instana//stanctl/metrics, /mnt/instana/stanctl/objects)
+     For POCs and smaller environments, it is okay to use a single filesystem, but for larger production environments, these should be separate filesystems with very fast disk I/O performance.
+
+Firewall ports need to be opened for inbound and outbound connections on key ports.  This has already been setup on the server, 
+but the ports are documented [here](https://www.ibm.com/docs/en/instana-observability/current?topic=cluster-system-requirements#networking-requirements)
+
+A few kernel tuning changes are required in order to optimize performance for Instana.  They kernel changes are documented [here](https://www.ibm.com/docs/en/instana-observability/current?topic=cluster-preparing#kernel-parameters)
+but have already been setup in your lab environment.  
+
+Prior to setting up Instana, you must setup DNS entries and aliases for the Instana server and key URLs such as the Agent ingress, OpenTelemetry ingress, etc. 
+The required DNS entries are documented [here](https://www.ibm.com/docs/en/instana-observability/current?topic=cluster-preparing#dns-settings), but have already been setup in your lab environment.
+
+
+Once, the prerequisites have been setup, you are ready to install the Instana server.  We will be performing an air-gapped installed.
+
+
+---
+
+## 3.3: Installing the stanctl Command
+
+The first step is to install the **stanctl** command on the Instana server virtual machine.   This command will be used to install
+the Instana server as well as perform administrative tasks.  This command helps reduce the complexity of installing and administering
+an Instana server.  In an air-gapped environment, you would run these commands from a bastion node and then extract the stanctl command from the air-gapped package.
+Since this environment is not air-gapped, we'll be running the commands on the Instana server.  
+The steps below are the same steps that you would run on the Bastion node in an air-gapped environment.
+
+:::info
+
+The following steps will install the **stanctl** command on the server.   
 
 :::
 
-:::tip
+First, you must setup the yum repository. Then, install the **stanctl** command from the yum repository.
 
-If you are unsure how to get access to the Bastion host (Guacamole) see
-[Accessing a Lab Environment](/instana-techxchange/labs/jam-in-a-box/#accessing-a-lab-environment)
+Begin by setting a DOWNLOAD_KEY environment variable.  When you get an Instana license, you are given a Download/Agent Key and a Sales Key.
 
-:::
-
-From the Bastion host (Guacamole), open a terminal window by selecting
-**Activities** at the top left of the screen and then the terminal icon.
-
-![open-terminal](images/open-terminal.png)
-
-Use the terminal to login to the Instana host:
+In this lab, you can get the Download Key from the /media/readme.txt file
 
 ```sh
-ssh jammer@instana
+cat /media/readme.txt
 ```
 
-When prompted if you want to continue connecting, type: `yes`
-
-Use sudo to become root.
+Copy and paste the Download Key and run the following command.  But, make sure you replace **<download_key>** with the actual download key from the readme.txt file.
 
 ```sh
-sudo -i
+export DOWNLOAD_KEY=<download_key>
 ```
 
-Prior to installing Instana, you must install Docker CE or Docker EE. Run the
-following commands to setup the prerequisites, download Docker CE, and install
-Docker CE on the virtual machine.
+Next execute the following command.  This will add the Instana repository to your list of Red Hat yum repositories.  Similar commands are documented for Debian/Ubuntu and SUSE Linux.
 
 ```sh
-apt-get install ca-certificates curl gnupg lsb-release -y
-mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt-get update -y
-apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
-```
-
-After the commands have executed, verify that docker is installed and running.
-You can run the `docker ps` command to confirm that it is installed and running.
-
-```sh
-docker ps
-```
-
-If docker is running, you should see output similar to what is shown below.
-
-![docker-ps](images/docker-ps.png)
-
-Next, we want to pin the major version of Instana so that we don't get updates
-during the lab. Issue the following command to pin the Instana version.
-
-:::note Copy & paste
-
-Be mindful when copying and pasting to ensure no extra lines are inserted by
-first copying the command to a text document.
-
-:::
-
-```sh
-cat >/etc/apt/preferences.d/instana-console <<EOF
-Package: instana-console
-Pin: version 231-1
-Pin-Priority: 1000
+cat << EOF > /etc/yum.repos.d/Instana-Product.repo
+[instana-product]
+name=Instana-Product
+baseurl=https://_:$DOWNLOAD_KEY@artifact-public.instana.io/artifactory/rel-rpm-public-virtual/
+enabled=1
+gpgcheck=0
+gpgkey=https://_:$DOWNLOAD_KEY@artifact-public.instana.io/artifactory/api/security/keypair/public/repositories/rel-rpm-public-virtual
+repo_gpgcheck=1
 EOF
 ```
 
-Next, create the following directories/filesystems that will be used for the
-Instana datastore storage.
-
-:::info
-
-Ideally, these directories/filesystems should be setup on fast storage volumes
-with a separate filesystem for each because the datastores are very I/O
-intensive. Even during a POC, these filesystems can become fairly large. Plan
-for a minimum of 20 Gig for the **data** directory, 200 Gig for the **metrics**
-directory, and 40 Gig for the **traces** directory. Production environments will
-be much larger and need to be planned for based on the size of the environment.
-
-:::
+Now, install the **stanctl** command by typing:
 
 ```sh
-mkdir /mnt/metrics
-mkdir /mnt/traces
-mkdir /mnt/data
+yum install -y stanctl
 ```
 
-You are now ready to start the installation of the Instana Server.
-
----
-
-## 3.3: Installing Instana Server
-
-Run the following commands to install the Instana Server. These commands will
-vary depending on which Linux platform you are using for your installation. The
-instructions below are for Ubuntu and Debian.
-
-Begin by installing the Instana package by issuing the following commands. Make
-sure the commands are successful before proceeding to the next step.
-
-:::info
-
-This will install the **instana** command on the server.
-
-:::
+Verify that the stanctl command has been successfully installed, is in your path, and is the correct version, by typing:
 
 ```sh
-echo "deb [arch=amd64] https://self-hosted.instana.io/apt generic main" > /etc/apt/sources.list.d/instana-product.list
-wget -qO - "https://self-hosted.instana.io/signing_key.gpg" | apt-key add -
-apt-get update -y
-apt-get install instana-console -y
+stanctl -v
 ```
-
-Now let's create the working directory for instana server installation:
-
-```sh
-mkdir -p /opt/instana && cd /opt/instana
-```
-
-Next, run the `instana init` command to install the Instana server. You will be
-prompted for additional information during the install.
-
-```sh
-instana init
-```
-
-When you run the _init_ command, it generates a file named _settings.hcl_ in
-your current directory. It is important to save this file. The settings.hcl file
-contains the configuration settings for your deployment. It can be used to
-enable additional features and make other configuration settings in the future.
-
-You will be prompted to select **single**, **dual-instana**, or
-**dual-clickhouse**. Type **Enter** to select **single**
-
-![](images/single.png)
-
-Next, you will be prompted to enter a tenant name for your Instana server. This
-can be any string. In a single server installation, the tenant name doesn't
-really matter, but in multi-tenant or SaaS environment, the tenant name is very
-important because it becomes part of the URL to access the Instana server.
-Customers frequently use their company name for the tenant.
-
-![](images/tenant.png)
-
-Next, you will be prompted to enter a unit name. In a single server
-installation, the unit name doesn't really matter, but in multi-tenant or SaaS
-environment, the unit name is very important because it becomes part of the URL
-to access the Instana server. Customers frequently use a business unit or Dev,
-Test, Prod to identify the unit.
-
-![](images/unit.png)
-
-You will now be prompted for your **agent key**. This is one of the requirements
-of the lab, you will need to bring your own Instana License.
-
-![](images/agentKey.png)
-
-The next step is to enter your **download key**. Use the same key as your
-**agent key** from the previous step.
-
-![](images/downloadKey.png)
-
-Next, enter your **sales key**. This is one of the requirements of the lab, you
-will need to bring your own Instana License.
-
-![](images/salesKey.png)
-
-Next, you will be prompted for the fully qualified hostname of the server.
-Normally, you would enter a fully qualified hostname, but in this demo
-environment we will use the IP address.
-
-:::caution Important
-
-Instead of specifying the hostname or fqdn, enter the **IP address** of the
-Instana server. In the Tech Zone lab environment it is `192.168.252.60`
-
-:::
-
-![](images/hostname.png)
-
-You will now be prompted for the path where your data will be stored. The
-default path is **/mnt/data**. Press **Enter** to accept the default value.
-
-![](images/data.png)
-
-You will now be prompted for the path where your traces will be stored. The
-default path is **/mnt/traces**. Press **Enter** to accept the default value.
-
-![](images/traces.png)
-
-Next, you will be prompted for the path where your metric data will be stored.
-The default path is **/mnt/metrics**. Press **Enter** to accept the default
-value.
-
-![](images/metrics.png)
-
-You will be prompted for the location of the Instana logs. Press **Enter** to
-accept the default value of **/var/log/instana**.
-
-![](images/logs.png)
-
-You will be prompted for the path to your signed certificate file. If desired,
-you can create your own. If you don't provide one, the installer will generate a
-certificate. Press **Enter** and let Instana generate a self-signed certificate.
-If you were deploying at a customer site and the customer wanted to use CA
-signed certificates, this is the step where you would specify the existing
-certificate.
-
-![](images/certificate.png)
-
-Finally, you will be prompted for the private key file. For this lab, press
-**Enter** and have the install generate the key file for the self-signed
-certificate.
-
-![](images/key.png)
-
-Instana will now begin the installation process. It will take 20 to 30 minutes
-to complete the installation process.
-
-:::info
-
-Troubleshooting
-
-- If there are any intermittent errors relating to containers being pulled or
-  starting you can run the `instana init` command again and resume the install
-  to try again.
-- If there are any errors relating to ports in use from a previous install
-  attempt, you can list the process listening on the port with
-  `lsof -t -i:<port-number>` and kill the process id returned with
-  `kill -9 <process-id>`
-
-:::
-
-At the end of the installation, you will be shown the URL to access the Instana
-server and a username of `admin@instana.local` and a **password**. Save this
-information so that you can use it later to login to the Instana user interface.
 
 The output should look something like this:
+```sh
+stanctl version 1.2.1 (commit=a3a91ef3db195cfbba3e4b9415d4afa610c49e12, date=2024-05-31T10:27:43Z)
+```
 
-![](images/install-success.png)
+This tells you that you have version 1.2.1 of the stanctl command installed.  This version is actually slightly old.  We have intentionally pinned
+this version in the yum repository to ensure that the stanctl command version matches the air-gapped package that we have downloaded.
 
-:::caution
+We recommend pinning the version to ensure that the **stanctl** command does not accidentally get upgraded when you upgrade the operating system.
 
-Before attempting to login to your Instana server, activate the license using
-the steps in the following section.
+
+
+
+
+## 3.4: Installing the Instana Server
+
+You are now ready to install the Instana Server
+
+Normally, the next step would be to download the air-gapped package by typing **stanctl air-gapped package** on a bastion node.  
+
+This would download the air-gapped package.   Then, you would copy the tar file to the Instana server.   We have already executed that step and placed
+the air-gapped package in /root directory.  You will see a file called /root/instana-airgapped.tar.gz.  We will be using that file to perform the install.
+
+The next step is to import the air-gapped package into your server.  Initiate this command by typing:
+
+```sh
+stanctl air-gapped import -f /root/instana-airgapped.tar.gz
+```
+You should see output similar to what's shown below.
+
+![import](images/import.png)
+
+Once the air-gapped package has been imported, you can perform the air-gapped install.
+
+To install the Instana server, you will use the **stanctl up** command.  This command has a number of options.  If you type **stanctl up --help** 
+you can the available options.
+
+```sh
+stanctl up --help
+```
+
+When you evaluate the output, you'll see a few very important flags that are described below.
+- --air-gapped:  This option indicates that you want to perform an air-gapped install.  If you don't specify this flag, stanctl will attempt to access the external repositories to download the code.
+- --core-smtp-from:  This specifies the user that sends emails from the Instana server
+- --core-smtp-host:  This the hostname or IP address of the SMTP server that Instana will use in order to send emails.
+- --core.smtp-port:  Specifies the port number of the SMTP server
+- --timeout:  This specifies the number of minutes and seconds in which the installation must complete.  The default is 30 minutes (30m0s)
+
+Normally, the install finishes within 15 to 20 minutes on a fast server.  However, during TechXchange, the servers are under heavy load.
+So, we want to increase the timeout value from 30 minutes to 60 minutes to ensure that it has time to complete.
+
+We're now ready to initiate the installation. Issue the following command:
+
+```sh
+stanctl up --air-gapped --core-smtp-from lab@techxchange.com --core-smtp-host instana.training --core-smtp-port 25 --timeout 60m0s
+```
+
+This command will install the Instana backend (server) and configure the SMTP settings.
+
+After issuing the command, you will be prompted for a number of required parameters.  The Download Key and Sales Key can be found in the /media/readme.txt file.
+
+Please respond to the following prompts as seen below:
+![installPrompts](images/installPrompts.png)
+
+First, you will be prompted for the type of installation (demo or production).  Press **Enter** to accept the default **demo** server installation.
+
+Next, you will be prompted for the _Download Key_.  When prompted, copy and paste the **Download Key** from the /media/readme.txt file.
+
+You will be prompted for the _Sales key_.  At the prompt, copy and paste the **Sales Key** from the /media/readme.txt file.
+
+Next, enter the _domain_ for the Instana server.  This is typically the fully qualified hostname of the Instana server and needs to be registered in DNS.   
+For this lab, type **instana.training**.
+
+Enter the _tenant name_ for this Instana server.  Instana is multi-tenant, so you must specify a tenant name.   Type **labs** for the _tenant name_.
+
+Enter the _unit name_ for the Instana server.  For this lab, type **student** for the _unit name_.  
+
+:::info
+
+The tenant and unit name are very important.  They become part of the URL that is needed to access the Instana server.  The hostname for the URL must be registered in DNS.
+So, for this lab, you MUST use the names specified in the lab guide to ensure your URL matches the DNS entries.  Ultimately, your Instana server URL will be https://student-labs.instana.training
 
 :::
 
-:::tip
+Next, you will be prompted for the Instana _admin password_.  Type **Passw0rd** for the _password_.
 
-- If at any time you need to
-  [restart Instana](https://www.ibm.com/docs/en/instana-observability/current?topic=premises-operations-docker-based-instana#stopping-all-components)
-  you can run the `instana stop` and `instana start` commands.
+Then, you will be prompted to confirm the _password_.  Again, type **Passw0rd**.
 
-:::
+Finally, you will be prompted to enter a TLS certificate.  If you want to use your own signed certificate, you would enter the path and filename of the certificate.
+In this case, just press the **Enter** key and the installer will generate a self-signed certificate.
 
-Change the password for the administrator account **admin@instana.local** to
-something easier to remember for the labs:
+Now that you have entered all of the required information, the installation will begin and should take about 20 to 30 minutes to complete.
 
-```sh
-instana configure admin -p Passw0rd
-```
+After the installation completes, you will see an output similart to what's shown below.
 
----
+![installed](images/installFinished.png)
 
-## 3.4: Activate the license
+At the end of the installation, the last part of the installation output is the URL and username that will be used to access the Instana server.
+Per the screen capture above, the URL will be **https://instana.training** and the username is **admin@instana.local**.
 
-After completing the installation, you must activate the license. We suggest you
-run the following commands in your working directory hence the license file will
-store here:
+You can login to that URL with the username and password that you specified during the installation (**Passw0rd**).
 
-```sh
-cd /opt/instana
-```
-
-Run the following command to download the license:
-
-```sh
-instana license download
-```
-
-![](images/licenseDownload_opt_instana.png)
-
-Next, import the license to activate your license:
-
-```sh
-instana license import
-```
-
-![](images/licenseImport_opt_instana.png)
-
-You can verify the license by typing:
-
-```sh
-instana license verify
-```
-
-![](images/licenseVerify_opt_instana.png)
+During the installation process, the license file was automatically downloaded and placed in the /root/.stanctl/license.json file.  It was also installed on the Instana server.
 
 ---
 
 ## 3.5: Launch the Instana User interface
 
-You are now ready to open a browser and login to the Instana user interface.
+Open the Firefox browser by clicking on the Firefox icon on the desktop.
 
-Open a firefox browser and select the **Instana** bookmark.
+![terminal](images/desktop.png)
 
-![open firefox](images/open-firefox.png)
+Once Firefox launches, enter the URL for the Instana server (**https://instana.training**) or click on the **Instana** bookmark on the menu bar.
 
-:::info
+Since you are using a self-signed certificate, you will see a security warning.  Click on Advanced.
 
-You can safely ignore the warning about the certificate being untrusted.
+![selfSigned](images/selfSigned.png)
 
-![untrusted-cert-advance](images/untrusted-cert-advance.png)
+Then, click **Accept the Risk and Continue**
 
-:::
+![accept](images/accept.png)
 
-When prompted, enter the username and password that you updated earlier.
+Finally, type in the username and password to log into the Instana server.  The username is **admin@instana.local** and the password is **Passw0rd**
 
-- Username: **admin@instana.local**
-- Password: **Passw0rd**
+Then, click the **Login** button.
 
 ![](images/login.png)
 
-You will be taken to an Initial Screen where you can install the instana agents
-or navigate to the main product UI. We will install an Instana Agent in the
-upcoming section of the lab.
+After logging in, you will receive another warning because the URL has done a redirect to add the unit and tenant into the URL.
 
-![initial-instana-page](images/initial-instana-page.png)
+Once again, click on Advanced and accept the risks and continue.
 
----
+![](images/acceptContinue.png)
 
-## 3.6: Turning on features and setting up SMTP
+You should now see Instana's welcome page where you can see many different options for installing Agents into different environments.   We'll be using those in the next section of the lab.
 
-Following the initial install of your Instana server, there are optional
-configurations that you will likely want to make.
-
-- You may need to setup the Instana server to use an SMTP server if you plan to
-  send out Email notifications.
-- There may be some optional features that you want to enable via feature flags.
-  Features such as VMware/vSphere monitoring, Power HMC monitoring, and zHMC
-  monitoring are disabled by default.
-
-Follow the steps below to configure the SMTP settings and enable some additional
-feature flags.
-
-1. Edit `settings.hcl` file according to the
-   [documentation](https://www.ibm.com/docs/en/obi/current?topic=installer-enabling-feature-flags).
-   The **settings.hcl** file will be located in the same directory where you
-   issued the **instana init** command.
-
-These parameters are added to the settings.hcl file in the section with the
-other feature flags. Search in the settings.hcl file for **feature**. Then, add
-any additional feature flags that are desired in that section of the file. They
-can be place anywhere within the **feature** section of the file.
+![](images/welcome.png)
 
 :::caution
 
-Be aware that turning on features (especially BETA features) may heavily impact
-backend performance. DO NOT turn on features you don't need\*\*
+If the Instana user interface is not available, do the following to diagnose.  First, confirm that you see the following message when your installation completed.
+Specifically, you are looking for the string **Successfully installed Instana Self-Hosted Standard Edition**
+![installed](images/installFinished.png)
+
+Assuming that the installation completed, confirm that all of the kubernetes pods are running.  Type **kubectl get pods -A**
+```sh
+kubectl get pods -A
+```
+
+You will see output similar to what's shown below.  For each pod, you should see a status of **Running** and the Ready column should have 1/1 or 2/2, indicating that all of the expected containers are running.
+If you see 0/1, it indicates that 1 container is expected and zero are running.   If you see 1/2, it means that 2 containers are expected, but only 1 is running.
+![installed](images/pods.png)
+
+If you do see pods with 0/1, 1/2, or 0/2, look at the status column.  
+Unless you see **STATUS** of **CrashLoopBackoff** or **Error** or **CreateContainerError**, it is likely that the Instana server is still starting up. 
+Give it a little more time.  Every minute or so, run the **kubectl get pods -A** command to see if additional pods have started. 
+
+Once all of the pods are **Running**, you should be able to log into the user interface.
+
 
 :::
 
-As we issued **instana init** from the working directory `/opt/instana`, the
-`settings.hcl` has been created there:
+---
+
+## 3.6: Turning on optional features and configuration changes
+
+Once the Instana server is installed, people frequently have the need to make modifications to the configuration.  There are two ways to make 
+changes.  First, you can execute the **stanctl backend apply** command and pass in parameters.  To see what options are available, type the following command:
 
 ```sh
-cd /opt/instana
+stanctl backend apply --help
 ```
 
-Before you edit the settings.hcl file, make a backup of the file by typing:
+You will see a number of optional parameters that can be specified.
+
+![](images/flags.png)
+
+During this lab, the only change we are going to make is to enable optional feature flags.
+
+The syntax to enable a feature flag is to execute:
+```sh
+stanctl backend apply --core-feature-flags <flag name>=true
+```
+
+To disable a feature flag, run the same command, but set the value to **false** instead of **true**.
+
+It is possible to enable multiple feature flags via a single command.
+
+For this lab, let's enable the synthetics capabilities.  This requires multiple flags to be enabled.  To enable all of the synthetics features, execute the following command:
 
 ```sh
-cp settings.hcl settings.hcl.bak
+stanctl backend apply  --core-feature-flags feature.synthetics.enabled=true feature.synthetic.browser.create.test.enabled=true feature.synthetic.browser.script.enabled=true
 ```
 
-Now, edit the settings.hcl file by typing:
+You will see output similar to what's shown below indicating that you have successfully setup the feature flag.
 
-```sh
-vi settings.hcl
-```
+![](images/flagSuccess.png)
 
-Locate the existing _feature_ settings and add the following feature flags.
-
-```java
-feature "infraCustomDashboards" {
-  enabled = true
-}
-feature "infraEntityExplore" {
-  enabled = true
-}
-```
+To see the synthetics feature flag within the Instana user interface, you must refresh your browser or log out and back in again.
 
 :::info
+Here is a list of several other feature flags that are frequently used.
 
-Note: There are other feature flags that you should be aware of, <span
-style={{color: "red"}}> but do not add these into the settings.hcl file</span>.
-Here are some common feature flags available are:
-
-```java
-feature "vsphereEnabled" {
-  enabled=true
-}
-feature "zhmcEnabled" {
-  enabled=true
-}
-feature "phmcEnabled" {
-  enabled=true
-}
-feature "beeinstana" {
-  enabled=true
-}
-feature "smartAlertsLogsBlueprintEnabled" {
-  enabled=true
-}
-feature "infraCustomDashboards" {
-  enabled = true
-}
-feature "infraEntityExplore" {
-  enabled = true
-}
-```
+- Logging:  stanctl backend apply --core-feature-flags feature.logging.enabled=true
+- Automation/Action Catalog:   stanctl backend apply --core-feature-flags feature.automation.enabled=true feature.action.automation.enabled=true
+- Power HMC:  stanctl backend apply --core-feature-flags feature.phmc.enabled=true
+- Z HMC:  stanctl backend apply --core-feature-flags feature.zhmc.enabled=true
+- Memory Leak Detection:  stanctl backend apply --core-feature-flags feature.rules.memoryleak.enabled=true
+- VMware vSphere Monitoring:  stanctl backend apply --core-feature-flags feature.vsphere.enabled=true
+- SLO features including apdex:  stanctl backend apply --core-feature-flags feature.slo.enabled=true feature.slo.websites.enabled=true feature.apdex.enabled=true feature.sloV2.enabled=true
+- Business Monitoring:  stanctl backend apply --core-feature-flags feature.business.observability.enabled=true
 
 :::
-
-Next, in the same file search for the **smtp** section in the settings.hcl file.
-Modify the smtp section to look like the below **making sure you enter the
-correct password supplied by the proctors**. We recommend that you edit the
-parameters rather than copy/paste this section. It is easy to make a mistake
-with the spacing when doing a copy/paste.
-
-:::note
-
-If you want, you can replace the **from** parameter with any Email address that
-you like. The **from** Email address is what you will see as the sender of the
-Email alerts from Instana.
-
-:::
-
-```sh
-  smtp {
-    from      = "server@instana.com"
-    host      = "localhost"
-    port      = 25
-    user      = "jammer"
-    password  = "Passw0rd"
-    use_ssl   = false
-    start_tls = false
-  }
-```
-
-Save the changes in the settings.hcl file.
-
-2. Apply the changes
-
-```sh
-instana update -f ./settings.hcl
-```
-
-:::tip
-
-It will take a little while for the configuration changes to take effect. The
-next section on upgrading the Instana Server is for information only, you can
-read it while the configuration changes are being applied.
-
-:::
-
-Once complete you should see the below
-
-![settings update](images/settings-update.png)
 
 ---
 
@@ -554,68 +417,97 @@ We want you to know the process for performing an upgrade.
 
 :::
 
+Note:  The following steps are a typical upgrade procedure, but it is important to always read the documentation in 
+case a particular version of the product requires additional steps or requirements such as increased CPU or Memory.
+
 When upgrading an Instana server, it is important to know that you can only skip
 one release when upgrading. The on-prem/self-hosted releases use odd numbers.
-That means that you can upgrade from version 225 to either 227 or 229. But, you
-can't upgrade from 225 to 231 because that would be skipping 2 releases and
+That means that you can upgrade from version 271 to either 273 or 275. But, you
+can't upgrade from 271 to 279 because that would be skipping 2 releases and
 isn't supported. It is important for customers to know this because they need to
 keep their Instana server patched on a fairly regular basis. Otherwise, it will
 mean that they will have to perform multiple steps to upgrade to the current
 version.
 
+This means that you typically want to plan to upgrade your Instana server every month or 2 at the most.  Otherwise, you have to perform multiple upgrades when you do decide to upgrade the server.
+
 Before attempting to upgrade, you want to confirm your current version. Issue
-the **instana version**
+the **stanctl version**
 
 ```sh
-instana version
+stanctl -v
 ```
 
-Next, find out what versions are available to be installed. Issue the the
-following command:
-
+If you have pinned your version, then you can issue the following command.  This command is specific to Red Hat.   Similar commands are available for other platforms.
+For example "apt-mark hold stanctl" for Ubuntu and Debian.
 ```sh
-apt-cache policy instana-console
+yum versionlock delete stanctl
 ```
 
-You will see a long list of versions that are available. Scroll to the top of
-the list where you will see the most recent versions. ![](images/versions.png)
-
-You'll notice that in this example, 229-2 is the most recent version and 229-1
-is the current version. That means you can upgrade to that minor release. There
-is newer major release available.
-
-First, install the latest instana-console. This upgrades the **instana** command
-that is installed on your server:
-
+Once you have unlocked the yum repository, you can upgrade the stanctl command by typing:
 ```sh
-apt install instana-console=229-2
+yum update stanctl
 ```
 
-Next, upgrade the server by issuing the **instana update** command. If you are
-in directory with the settings.hcl file, then you don't need any arguments.
-Otherwise, specify the path to the settings.hcl file.
-
+Confirm that stanctl has been upgraded by typing:
 ```sh
-instana update -f /opt/instana/settings.hcl
+stanctl -v
 ```
 
-When performance the upgrade, the installer automatically pulls down the latest
-docker containers and gets them up and running on the Instana server.
+Following the upgrade, you can use the following command to add the version lock back in place:
+```sh
+yum versionlock add stanctl
+```
+
+Finally, you can upgrade the Instana server by issuing the following command:
+```sh
+stanctl up
+```
+
+You will be prompted whether you want to upgrade the Instana server.  Select the option to upgrade the server and within 10 or 15 minutes the servers will be upgraded.
 
 ---
 
-## 3.8: Summary
+## 3.8: Setting Up Self-Monitoring
+The **Standard Edition** Instana backend includes support for self-monitoring.  This can easily be setup via the **stanctl** command.
+To enable self-monitoring, run the following command as the **root** user on **Instana** server.
 
-In this portion of the lab, you have learned how to install a self-hosted docker
-based Instana server. For a POC, we recommend either SaaS or the single server
-self-hosted docker installation of the Instana server. For production
-deployments, customers will want the kubernetes based deployments to gain
-improved scalability and resiliency.
+From the terminal window, type:
+```sh
+stanctl agent apply
+```
+
+You will see output similar to what's shown below.
+
+![](images/self-monitoring.png)
+
+Within a short amount of time, the self-monitoring will begin monitoring:
+- The host operating system 
+- The kubernetes cluster
+- Cassandra Database
+- ClickHouse Database
+- PostgreSQL
+- Kafka
+- Zookeeper
+- JVMs
+- And more...
+
+---
+
+## 3.9: Summary
+
+In this portion of the lab, you have learned how to install a single server self-hosted **Standard Edition**
+Instana server (backend). For a POC, we recommend either SaaS or the single server **Standard Edition**
+installation of the Instana server. For small deployments, the **single server Standard Edition** is appropriate.
+And, for medium sized deployments, you can deploy a **3 node Standard Edition** Instana server.  In some cases, 
+**Standard Edition** may not meet your needs for scale/horizontal scale or HA/resiliency.  In those cases, deploy the **Custom Edition** of Instana.
 
 You have also learned how to configure the SMTP settings and how to enable
 feature flags.
 
-Finally, you learned how to upgrade a docker based self-hosted Instana server.
+You learned how to upgrade the **Standard Edition** Instana server.
+
+Finally, you learned how to setup the self-monitoring capability that is part of **Standard Edition**
 
 You are now ready to learn how to install and configure an Instana Agent.
 

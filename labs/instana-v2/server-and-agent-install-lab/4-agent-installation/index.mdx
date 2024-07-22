@@ -22,18 +22,9 @@ processes. Some of the available options are listed below:
 
 All above mentioned methods are accessible via the wizard on the Instana UI
 
-:::caution
-
-If the Instana user interface is not available, go back and look at the command
-prompt where you issued the **instana update** command to change the
-configuration parameters. The command may still be running. The user interface
-won't be available until the update is complete.
-
-:::
-
 :::caution Important
 
-The Instana agent install requires **root** privileges.
+The Instana agent install requires **root** privileges in order to gain the full benefits of the monitoring capabilities, including auto-discovery and auto-instrumentation.
 
 :::
 
@@ -46,11 +37,11 @@ the excerpt from the
   repositories. By default, a dynamic agent updates itself daily with the latest
   and greatest capabilities that are released. It is also possible to tightly
   control the updating of dynamic host agents by
-  [pinning a version](https://www.ibm.com/docs/en/obi/current?topic=agent-updates-dynamic-host-agents#version-pinning)
+  [pinning a version](https://www.ibm.com/docs/en/instana-observability/current?topic=agents-configuring-updates-dynamic-host#version-pinning)
 
   By default, dynamic host agents use the Instana repository to pull updates,
   but it is possible to
-  [set up your own managed mirror](https://www.ibm.com/docs/en/obi/current?topic=agent-repositories#agent-repositories).
+  [set up your own managed mirror](https://www.ibm.com/docs/en/instana-observability/current?topic=agents-setting-up-agent-repositories-dynamic-host).
   Currently, the mirror must be a Nexus repository. This is probably the best
   option for must customers because it allows them the benefits of automatic
   updates, while at the same time controlling the content that is in the
@@ -64,7 +55,7 @@ the excerpt from the
 :::tip
 
 Static host agents require no internet connection to the Instana repository, and
-are recommended in restrictive network setups.
+are recommended in restrictive network setups or strict change control processes.
 
 :::
 
@@ -72,69 +63,56 @@ are recommended in restrictive network setups.
 
 ## 4.2: Installing Instana Agent on a Linux VM
 
-We will start by installing the Instana Agent on the Linux VM that is running
-IBM MQ and ACE.
+We will start by installing the Instana Agent on the middleware Linux VM that is running
+IBM DB2
 
-![architecture-agent-mqace-vm](images/architecture-agent-mqace-vm.png)
+![lab environment](images/labEnvironment.png)
 
-Open a new terminal tab by selecting **File** -> **New Tab**.
+Open a new terminal tab by selecting **File** -> **New Tab** or launch a new terminal window.
 
-SSH to the ACE/MQ server as follows:
-
-```sh
-ssh jammer@mqace
-```
-
-When prompted if you want to continue connecting, type: `yes`
-
-Use sudo to switch to the root user:
+SSH to the middleware server as follows:
 
 ```sh
-sudo -i
+ssh root@middleware
 ```
 
-Refer back to Firefox where the **Installing Instana Agents** (shown below) page
-should now be open.
+When prompted, type **Passw0rd** for the root password.
 
-![instana-default-login](images/instana-default-login.png)
+Assuming you haven't clicked on anything, your Firefox browser should be showing the welcome screen.
+![](images/welcome.png)
 
 :::tip
 
-If you aren't on the **Installing Instana Agents** screen you can get there by
-selecting the **"Stan"** robot icon in the upper left corner and then clicking
+If you aren't on the **Welcome** screen or **Installing Instana Agents** screen you can get there by
+selecting the **"Home"** icon in the upper left corner and then clicking
 the **"Deploy Agent"** button near the upper right corner.
 
-![](images/DeployAgent.png)
+![](images/installAgents.png)
 
 :::
 
-A list of different environments where you can install the Instana Agent is
-shown. This is a Linux server, so select Linux on the left side of the screen.
+On this screen, you will see all of the Installation options that can be used to install the Instana Agent.  
+Look at the boxes labeled **Linux**.  You will see a few options including the **Automatic Installation (One-liner)**, **Packages (DEB, RPM)**, and **Archive tar.gz**.
+All of these options will work. It just depends on your preferences.  However, the easiest and suggested option for is to use the **Automatic Installation (one-liner)**. 
 
-![](images/2022-05-21-17-48-04.png)
+This installation option requires access to an Agent and sensor repository.  The repository can be mirrored internally or is available externally.  For this lab, we will use the external repository.
 
-Then you can selected the **Technology** dropdown and choose from a list of
-installation options. For example, on Linux, you can choose a automatic
-**one-liner** installation, RPM, or TAR file installation. For
-OpenShift/kubernetes, you have multiple options including operator, helm, and
-yaml installs. The easiest method is the default, **"Automatic Installation
-(One-Liner)"**. Select that option in the dropdown list.
+Click on the box labeled **Automatic Installation (one-liner)**.  
 
-Notice that there are a few other options including the use of different java
-versions, static vs. dynamic agents, etc. Leave the default settings.
+You will see a configuration panel as seen below.  There are a few key options that are highlighted.  With one exception, you should be able to use the defaults and simply copy/paste the curl command.  
 
-Next, select the checkbox next to **"Install and start as service"**. This will
-setup the systemctl autostart process and will also start the Agent immediately
-after it is installed.
+The one option that you do want to change is to select the checkbox to **Install and start as a service**.  This will ensure that the Agent starts automatically when the server reboots.
 
-![](images/linuxInstall.png)
+![](images/one-liner.png)
 
-Finally, copy and paste the curl command into the **root@mqace** terminal window
-and answer `y` when prompted.
+
+You are now ready to begin the install.   Copy the curl command from the Instana user interface and paste it into the terminal window where you are logged into the **middleware** virtual machine.
+
+Next, you will be prompted to confirm the install.  Answer **`y`** when prompted.
 
 Once complete you will see the below:
 
-![](images/instana-install-result.png)
+![](images/agentInstall.png)
 
 At this point the Agent is installed and up and running. You can confirm this by
 running:
@@ -151,179 +129,182 @@ root       22012       1 99 12:35 ?        00:00:11 /opt/instana/agent/jvm/bin/j
 
 The Agent will automatically start monitoring the operating system and start
 discovering key processes and middleware. In many cases it will automatically
-instrument those technologies. In the case of some technologies (eg. MQ an and
-App Connect Enterprise), there are manual configuration steps required due to
+instrument those technologies. In the case of some technologies (eg. IBM App Connect Enterprise and DB2), there are manual configuration steps required due to
 the need to provide credentials for accessing those applications.
 
----
+Let's configure one of those technologies that require configuration.  In this case, the DB2 sensor requires some configuration parameters.
 
-## 4.3: Installing Instana Agent in a Docker Environment
-
-Next, you will install the Instana agent as a container running in Docker on the
-Instana server.
-
-![architecture-agent-mqace-vm](images/architecture-agent-instana-vm.png)
-
-You can navigate back to your first tab still logged into the **instana** host
-or from a terminal ssh to the Instana server again:
+From the terminal window on the middleware VM, edit the Instana configuration.yaml file by typing:
 
 ```sh
-ssh jammer@instana
+vi /opt/instana/agent/etc/instana/configuration.yaml
 ```
 
-Switch to root
+This configuration.yaml file has a number of parameters that can be configured.  For example, you can define a **zone** where the VM will appear in the Infrastructure view.
 
+Please remember that yaml files are very sensitive to spacing.  Each line must be indented by 0, 2, 4, 6, spaces, etc. and must be indented with spaces and not tabs.
+
+Search for **Hardware & Zone** by typing:
 ```sh
-sudo -i
+/Hardware
+```
+You will be taken to the **Hardware & Zone** section.  Uncomment the last 3 lines in the section and change the value for the availability-zone to **lab**.
+
+The file should now look like this:
+
+![](images/hardwareZone.png)
+
+Next, let's edit the configuration for the DB2 sensor.  DB2 requires key configuration information such as the port and credentials in order to monitor the databases.
+
+For more information on configuring the DB2 sensor see the [DB2 sensor documentation](https://www.ibm.com/docs/en/instana-observability/current?topic=technologies-monitoring-db2#configuring-ibm-db2-sensor).
+
+Within the configuration.yaml file, type the following to search for the DB2 section.
+```sh
+/DB2
 ```
 
-In the Instana UI, from the **Installing Instana Agents** screen select
-**Docker** this time.
+Within this section, you will see many options including both local and remote monitoring.  We will configure local monitoring.
+Uncomment the lines shown in the picture below.  You should uncomment 8 lines in the configuration.yaml file.  Then, change the following values:
 
-:::tip
+Change the **port** value to **25010**
+Change the **password** value to **Passw0rd**
+Change the database name from **database1** to **TEST**
 
-If you aren't on the **Installing Instana Agents** screen you can get there by
-selecting the **"Stan"** robot icon in the upper left corner and then clicking
-the **"Deploy Agent"** button near the upper right corner.
+![](images/db2.png)
 
-![](images/DeployAgent.png)
+:::info
+
+You may notice that we are putting a password into a configuration file.  Since we don't need our passwords to be secure for this lab, we are entering them directly in the file.
+
+But, Instana does have an option to store sensitive information in kubernetes secrets, [IBM Cloud Secret Manager](https://www.ibm.com/docs/en/instana-observability/current?topic=cha-configuring-host-agents-by-using-agent-configuration-file#ibm-cloud-secrets-manager) or in [Hashicorp vault](https://www.ibm.com/docs/en/instana-observability/current?topic=cha-configuring-host-agents-by-using-agent-configuration-file#hashicorp-vault).
 
 :::
 
-At the top of the page you will see an entry box where you can specify a
-**Zone**. Specify a zone name such as **TechZone**. Then, copy the docker run
-command and paste it into the **root@instana** terminal window.
+The configuration yaml file contains many other options including monitoring **custom processes**, **filesystems**, **custom java classes** and much more. 
 
-![](images/docker-agent.png)
+:::info
 
-This will install the Instana Agent as a docker container running on the Instana
-Server machine.
-
-Once complete you can issue a **docker ps** command, you'll see there is a new
-Instana agent container running.
-
-```sh
-docker ps | grep agent
-```
-
-![docker ps agent](images/docker-ps-agent.png)
-
-Once installed, the Agent will begin to collect host metrics and will discover
-the various technologies like Cassandra, ClickHouse, ElasticSearch, Nginx,
-Node.js, and more. Many of these technologies will be monitored automatically
-without the need for configuration. In some cases, the sensors need to be
-configured in order to see the performance metrics.
-
----
-
-## 4.4: Installing Instana Agent on OpenShift Cluster
-
-The next step is to install the Instana Agent into the **Apps** Sing Node
-OpenShift Cluster that in future labs we'll be using to host our demo
-applications _Robot Shop_ and _Quote of the Day_.
-
-![architecture-agent-ocp](images/architecture-agent-ocp.png)
-
-:::tip
-
-Throughout this lab, we will be using the "oc" command to run commands within
-OpenShift. The "oc" command is similar to kubectl for other versions of
-Kubernetes. There are some minor syntax differences.
+Updates to the configuration.yaml file are read dynamically by the Instana Agent.  As soon as you save your changes to the file, the Instana Agent will read the changes use the configuration settings that you made.
 
 :::
 
-**Open another tab in your terminal** so you are back on the local bastion host
-**admin@bastion-gym-lan**.
+---
+
+## 4.3: Installing Instana Agent on the Kubernetes Cluster
+
+The next step is to install the Instana Agent into the **k8control** Single Node
+kubernetes cluster.  This cluster has **Robot Shop** application installed and running with automated application traffic.
+
+![lab environment](images/labEnvironment.png)
+
+:::tip
+
+Throughout this lab, we will be using the **kubectl** command to run commands within
+the kubernetes cluster. We will also be using the **helm** command to perform the Agent install.  
+
+
+:::
+
+**Open another tab in your terminal** or open a new **terminal** window. 
+
+From the terminal window, ssh to the k8control server by typing:
+
+```sh
+ssh root@k8control
+```
+
+If prompted, type **Passw0rd** for the root password.
+
+You should now be logged into the virtual machine that is running kubernetes.   
 
 Check to make sure you are in the right place by running the following:
 
 ```sh
-cd ~
-oc cluster-info --kubeconfig kubeconfig-apps
+kubectl get pods -A
 ```
 
-You should see the following output, specifically the url
-`https:api.sno.techzone.lan:6443`. If you don't try opening a new tab or
-terminal window and trying again.
+You should see a list of pods that are running in the cluster, including the robot-shop pods.
 
-![check-cluster](images/check-cluster.png)
+:::tip
 
-Follow the steps below to install the Agent into the cluster:
+In some kubernetes clusters, permissions are locked down fairly tight and may require additional configuration to enable the Instana Agent to monitor the entire cluster.
+In the lab environment, no additional configuration is necessary.
 
-Set the correct cluster to use:
+:::
 
-```sh
-export KUBECONFIG=~/kubeconfig-apps
-```
 
-Set permissions for the Instana Agent to allow the Agent to have access to
-monitor the entire cluster:
-
-```sh
-oc adm policy add-scc-to-user privileged -z instana-agent --kubeconfig kubeconfig-apps
-```
-
-From the **Installing Instana Agents** screen select OpenShift from the list.
+From the **Installing Instana Agents** screen we will be selecting an option to Install the Agent in a kubernetes environment.
 
 :::tip
 
 If you aren't on the **Installing Instana Agents** screen you can get there by
-selecting the **"Stan"** robot icon in the upper left corner and then clicking
+selecting the **"Home"** icon in the upper left corner and then clicking
 the **"Deploy Agent"** button near the upper right corner.
 
-![](images/DeployAgent.png)
+![](images/installAgents.png)
 
 :::
 
-![](images/OpenShift.png)
+You will see a number of tiles for Installing the Instana Agent into different environments.  For Kubernetes environments, you will see options for
+- Kubernetes helm chart
+- Kubernetes Operator
+- Kubernetes yaml
+- And specific options for Kubernetes in AWS and Azure.
 
-Select the dropdown list next to the word **"Technology"**. Notice that there
-are multiple options for installing the Agent. Choose the **"Helm chart"**
-option from the list.
+Our general recommendation is to use the helm install.  While there are benefits to Operator based installs, it is more complex than the helm install.
 
-Set the **Cluster name** to `SNO` and the **Agent Zone** name to `Demo Apps`
-since this OCP cluster will be used for the Quote of the Day and Robot Shop demo
-application. Setting these values will allow you to find your Agent and
-Kubernetes Cluster within the user interface and not get confused by data coming
-in from other agents.
+![](images/helmInstall.png)
 
-:::info
+Select the tile for the **Kubernetes helm chart**
 
-Zones are used to organize the Instana Agents (and sensors). Many customers
-create zones for lines of business, data center locations, public cloud regions,
-etc
+A dialog will open providing details for the helm chart.
+
+![](images/helmInstall2.png)
+
+In the dialog, first enter a name for your kubernetes cluster.   We recommend specifying **k8control**.  Then, specify a **zone** name for your cluster.  
+
+As you enter those parameters, the helm command in the black area will be updated to include the cluster name and zone name that you specified.
+
+Next, click the **copy** button and the text for the helm command will be copied into your buffer.
+
+Then, within the **terminal window** on the **k8control** virtual machine, **right click** and select **paste**
+
+![](images/pasteHelm.png)
+
+You will see the helm command pasted onto your screen. 
+
+![](images/pasteHelm2.png)
+
+After seeing the text on the screen, press the **Enter** key to submit the helm command.
+
+The helm chart will begin installing into the Kubernetes cluster.  It will automatically create the instana-agent namespace and then install the Agent into that namespace.
+
+:::tip
+
+When you install the Agent into a Kubernetes environment, it installs two componenets.  First, it installs the **Host Agent** as a daemonset so that one Agent runs as a pod on each worker node.
+There are optional parameters that allow you to run the daemonset on the **Master** nodes as well.  In addition, a deployment called **k8sensor** is deployed.
+It will deploy 3 replicas of the pod to ensure resilieincy.  The k8sensor is responsible for monitoring the kubernetes cluster performance and availability.
 
 :::
 
-Copy the command from the Instana Web UI and run it as the admin user on the
-bastion host.
-
-:::note Copy & paste
-
-Be mindful when copying and pasting to ensure no extra lines are inserted by
-first copying the command to a text document.
-
-:::
-
-You will see output similar to what's shown below
-
-![helm install](images/helm-install.png)
-
-Next, view a list of the pods that are running in the agent namespace. There
-will be one pod for each worker node in your target cluster. This SNO cluster
-only has one worker node so you will only see one pod running.
-
+To confirm that the Agent is installed and running, type:
 ```sh
-oc get pods -n instana-agent --kubeconfig kubeconfig-apps
+kubectl get pods -n instana-agent
 ```
+You should see both the **instana-agent** and **k8sensor** pods running.
 
-![running agent pods](images/ocp-agent-running.png)
+After a few minutes, you will can see both the **Host Agent** and the **k8sensor** in the Instana user interface.
 
-This completes the installation of Instana agent on OpenShift cluster.
+This completes the installation of Instana agent on Kubernetes cluster.
 
 ---
 
 ## 4.5: View Instana Agents in the Instana UI
+
+
+From the welcome page, click the **Go to Instana!** button
+![](images/goToInstana.png)
+
 
 From the **Installing Instana Agents** screen, select the **Go to Instana!**
 button. If you don't see the button you can move on to the next step.
@@ -334,35 +315,34 @@ Select **Infrastructure** from the left navigation menu.
 
 ![](images/select-infra-from-home.png)
 
-You should see 3 nodes reporting. The **Instana VM**, the **MQACE VM** and the
-**Single Node OpenShift (SNO) VM**. If you don't see them yet, give the agents a
+You should see 3 nodes reporting. The **Instana VM**, the **middleware VM** and the
+**k8control kubernetes VM**. If you don't see them yet, give the agents a
 few minutes to start up.
 
-:::note
+![](images/infrastructure.png)
 
-In an upcoming section we will learn how to update the name of the zone where
-the _MQACE_ VM resides.
+In addition, if you click on **Platformm** and then **Kubernetes**, you will see that you are monitoring two kubernetes clusters.
+The first cluster is the self-monitoring for your Instana server (backend) and the other cluster is the k8control kubernetes cluster.
 
-:::
+You can click on the blue links with the cluster names to drill into the cluster details.
 
-![](images/show-three-clusters.png)
+![](images/clusters.png)
 
 ## 4.6: Troubleshooting Instana Agent Installation on Linux
 
-If you cannot see the **Instana** or **MQACE** hosts in the Instana UI you
+If you cannot see the **middleware** hosts in the Instana UI you
 should read the Instana agent logs on the respective agent host located at
 `/opt/instana/agent/data/log/agent.log`. Look for the current status and any
 warnings or errors that may be shown.
 
 ## 4.7: Troubleshooting Instana Agent Installation on Kubernetes Cluster
 
-If you don't see the **SNO host** in the **Demo Apps** zone after a couple of
-minutes, you need to troubleshoot the Instana Agent.
+If you don't see the **Instana** node or the **k8control node after a couple of
+minutes, you need to troubleshoot the Instana Agent that is running in kubernetes.  
 
 :::caution Important
 
-The following must be done from a terminal window on the bastion host
-(**admin@bastion-gym-lan**)
+The following must be done from a terminal window on each of the kubernetes cluster nodes (instana and k8control)
 
 :::
 
@@ -371,13 +351,13 @@ DaemonSet the number of pods should be equal to number of nodes in your cluster,
 in this case one.
 
 ```sh
-oc get pods -n instana-agent --kubeconfig kubeconfig-apps
+kubectl get pods -n instana-agent
 ```
 
-You can check the Instana Agent pod logs by running:
+You can check the Instana Agent pod logs by typing the following.  Make sure to replace **<pod_name>** with the actual pod name.
 
 ```sh
-oc logs $(oc get pods -n instana-agent -o custom-columns=POD:.metadata.name --no-headers --kubeconfig kubeconfig-apps) -n instana-agent -c instana-agent --kubeconfig kubeconfig-apps
+kubectl logs <pod_name> -n instana-agent
 ```
 
 ---
@@ -451,25 +431,7 @@ applied, make sure that it's not a formatting error
 
 ---
 
-## 4.10: Agent Configuration Troubleshooting
-
-:::warning Information Only
-
-This section is here for informational purposes. There are no steps to execute.
-
-:::
-
-The first place to look when the agent does not start properly or does not work
-as expected is agent log file. By default it is located in
-`/opt/instana/agent/data/log/agent.log` . This is the path for a traditional
-server.
-
-In case of Kubernetes based deployment you have to look at logs of
-`instana-agent` pods running in `instana-agent` namespace.
-
----
-
-## 4.11: Configuring GitOps for Agents
+## 4.10: Configuring GitOps for Agents
 
 :::warning Information Only
 
@@ -493,5 +455,8 @@ The Instana agent fetches configuration updates from the remote repository:
 
 ---
 
-Proceed to section 4, where you will install and instrument the Robot Shop
-application.
+## 4.11: Configuring GitOps for Agents
+
+In this section of the lab, you have learned how to install and configure 
+Agents on traditional Linux VMs and kubernetes.  This includes the configuration of the **Zone** and the **DB2** sensor. 
+Finally, you have viewed the monitoring Agents and sensors within the Instana user interface.
