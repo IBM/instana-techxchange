@@ -172,6 +172,11 @@ Change the database name from **database1** to **TEST**
 
 ![](images/db2.png)
 
+Next, save and exit the **"vi"** session by typing **":wq!"**
+```sh
+:wq!
+```
+
 :::info
 
 You may notice that we are putting a password into a configuration file.  Since we don't need our passwords to be secure for this lab, we are entering them directly in the file.
@@ -320,6 +325,20 @@ You should see 3 nodes reporting. The **Instana VM**, the **middleware VM** and 
 few minutes to start up.
 
 ![](images/infrastructure.png)
+
+Feel free to click on the nodes in the Infrastructure view to view the performance data.  In particular, we suggest you click on the node labeled **instana** and view the self-monitoring information.
+
+Select the node.  Then, click **Open Dashboard**
+![](images/openDashboard.png)
+
+If you did not navigate to the **Host** dashboard, then click on the **...** breadcrumbs at the top of the screen and select the **Host** Agent.
+![](images/hostAgent.png)
+
+On the left side of the screen, you will notice that Instana is monitoring most of the key components that make up the Instana server.  
+There are sensors monitoring the cassandra database, kafka, elasticsearch, and more
+![](images/sensors.png)
+
+Feel free to drill into some of the sensors to view the health and performance of the Instana server.
 
 In addition, if you click on **Platformm** and then **Kubernetes**, you will see that you are monitoring two kubernetes clusters.
 The first cluster is the self-monitoring for your Instana server (backend) and the other cluster is the k8control kubernetes cluster.

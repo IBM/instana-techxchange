@@ -110,8 +110,11 @@ You should now be logged into the Instana server virtual machine as the root use
 
 
 
-Prior to installing Instana, there are a number of prerequisites that need to be in place.  For this lab, we have already
-setup the prerequisites, but it is important that we review them here.  For reference, the requirements are documented [here](https://www.ibm.com/docs/en/instana-observability/current?topic=cluster-system-requirements).  
+Prior to installing Instana, there are a number of prerequisites that need to be in place.  
+
+:::info
+For this lab, we have already setup the prerequisites, but it is important that we review them here.  
+For reference, the requirements are documented [here](https://www.ibm.com/docs/en/instana-observability/current?topic=cluster-system-requirements).  
 Key prereqs are:
 * Filesystems must be setup properly on the server.  Key requirements are:
     * Approximately 60 Gig of space in the /var filesystem to store the container images that will be used for Instana.
@@ -119,6 +122,8 @@ Key prereqs are:
     * Four large filesystems to store the data.  In your lab enviroment, you will see the following 4 directories:
      (/mnt/instana/stanctl/analytics, /mnt/instana/stanctl/data, /mnt/instana//stanctl/metrics, /mnt/instana/stanctl/objects)
      For POCs and smaller environments, it is okay to use a single filesystem, but for larger production environments, these should be separate filesystems with very fast disk I/O performance.
+
+Note: For this lab we setup directories for the Instana installation.  Normally, these are setup as separate filesystems.
 
 Firewall ports need to be opened for inbound and outbound connections on key ports.  This has already been setup on the server, 
 but the ports are documented [here](https://www.ibm.com/docs/en/instana-observability/current?topic=cluster-system-requirements#networking-requirements)
@@ -131,7 +136,7 @@ The required DNS entries are documented [here](https://www.ibm.com/docs/en/insta
 
 
 Once, the prerequisites have been setup, you are ready to install the Instana server.  We will be performing an air-gapped installed.
-
+:::
 
 ---
 
