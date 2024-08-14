@@ -7,20 +7,20 @@ sidebar_position: 30
 
 ## Install Synthetic Point of Presence component
 
-We will be installing the Synthetic Point of Presence into the Kubernetes cluster. In order to do that, we'll need access to a CLI will access to the cluster.
+We will be installing the Synthetic Point of Presence into the **K8 Control** Kubernetes cluster. In order to do that, we'll need access to a CLI will access to the cluster.
 
-From the browser, open Student VM 
+From the browser, open **Student VM** console
 
-![](images/student-vm.png)
+![](images/student-vm-new.png)
 
 Open a terminal in the Student VM
 
-![](images/student-terminal.png)
+![](images/student-terminal-new.png)
 
-Login to the Kubernetes VM using ssh command:
+Login to the **K8 Control** Kubernetes VM using ssh command:
 
 ```bash
-ssh root@10.0..20
+ssh root@10.0.0.20
 ```
 
 At this point, the Instana server is capable of running and displaying synthetic tests, but you still need to setup the "Synthetic Point of Presence" component.
@@ -32,11 +32,11 @@ curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 In the Student VM, open the Instana UI in the browser
 
-![](images/instana-ui.png)
+![](images/instana-ui-new.png)
 
 Click on "Synthetic Monitoring" and then on "Deploy a PoP" button:
 
-![](images/DeployAPoP.png)
+![](images/DeployAPoP-new.png)
 
 Use **Simple** tab for Helm command. 
 
@@ -112,7 +112,7 @@ STATUS: deployed
 
 After the Synthetic point of presence is installed verify its appearence in the interface:
 
-![](images/PointOfPresence_Location.png)
+![](images/PointOfPresence_Location-new.png)
 
 You can also confirm that the Synthetic Point of Presence is running by typing:
 ```sh
@@ -130,7 +130,7 @@ The last step is to adjust the internal hosts configuration of the Instana Synth
 Please apply the below command
 
 ```sh
-kubectl patch deployment synthetic-pop-javascript-playback-engine -n instana-synthetic --patch '{"spec": {"template": {"spec": {"hostAliases": [{"hostnames": ["unit0-tenant0.rhserv.ibm.edu"],"ip": "10.100.1.203"}]}}}}'
+kubectl patch deployment synthetic-pop-javascript-playback-engine -n instana-synthetic --patch '{"spec": {"template": {"spec": {"hostAliases": [{"hostnames": ["student-labs.instana.training"],"ip": "10.0.0.10"}]}}}}'
 ```
 
 After a few minutes, the list of pods should look like the below
