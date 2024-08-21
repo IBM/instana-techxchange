@@ -22,6 +22,10 @@ Login to the **K8 Control** Kubernetes VM using ssh command:
 ```bash
 ssh root@10.0.0.20
 ```
+:::note
+Credential information is located in file *synthetic-monitoring-lab.txt* in folder /home/ibmuser/Documents in **Student VM**.
+:::
+
 
 At this point, the Instana server is capable of running and displaying synthetic tests, but you still need to setup the "Synthetic Point of Presence" component.
 
@@ -92,7 +96,7 @@ Copy the helm command from the text file and paste it into a terminal window on 
 You should see an output similar to the following:
 
 ```sh
-[root@rhserv ~]$ helm install synthetic-pop \
+[root@k8control ~]$ helm install synthetic-pop \
 >     --repo https://agents.instana.io/helm  \
 >     --namespace instana-synthetic \
 >     --create-namespace \
