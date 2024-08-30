@@ -13,6 +13,18 @@ In this section of the lab, you will complete the following configurations:
 - Enable the OpenTelemetry data ingestion in the configuration.yaml file
 - Start the Instana agent with OpenTelemetry configuration
 
+## How to collect Otel data?
+
+There are two options you can use in order to send Otel data to the Instana backend:
+1. Through the Instana Agent
+2. Directly to the Instana backend 
+
+For this lab, we will focus on point 1 - we will be sending data to the Instana backend using Instana Agent.
+
+:::note
+Sending Otel data through the Instana Agent can be useful for some implementations with more strict firewall rules
+:::
+
 ## Enabling the OpenTelemetry data ingestion
 
 By default, the OpenTelemetry data ingestion in the Instana host agent is deactivated. That is why, you have to enable the OpenTelemetry configuration. 
@@ -29,7 +41,12 @@ next, proceed to the opentelemetry-demo directory
 cd /root/opentelemetry-demo/instana/agent
 ```
 
-next, edit the configuration.yaml file 
+next, edit the configuration.yaml file
+
+:::note
+Please note, that the default location for the configuration.yaml file is in the Instana agent directory - for example
+/opt/instana/agent but in the case of this Lab, we have prepared ready-to-use configuration with pre-configured Otel settings
+:::
 
 ```sh
 vim configuration.yaml
