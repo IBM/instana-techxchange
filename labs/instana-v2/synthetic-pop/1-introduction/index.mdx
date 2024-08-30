@@ -6,17 +6,22 @@ sidebar_position: 10
 
 # Synthetic Monitoring and Action Catalog
 
-This lab focuses on two new Instana features.  The first is synthetic monitoring.  The second is the Action Catalog where you can create and execute automated corrective actions.
+Synthetic monitoring provides numerous benefits and values to client who wants to uphold their application's availability and uptime
+- Monitor websites or applications/functions to ensure they are available at all times even during low or no user traffic, as synthetic tests can be configured to run at continuous interval.
+- Help to troubleshoot issues with application's response times via multiple "Point of Presence" at different network segments.
+
+Before we can create any synthetic tests, we first setup a Synthetic "Point of Presence" or "PoP server" to playback our synethetic tests.
+These synthetic tests can be configured to run on a PoP that you deploy or a PoP provided by Instana. The Instana-managed PoP is supported only on Instana SaaS.
+Many customers deploy two or more PoP so that they can compare the response time and availability from different network zones.
+For example, if a PoP server running in the LAN network performs well, but a PoP server located on a WAN network is performing poorly, it is clear indication that the problem is the network or load balancer rather than the application.
+
+This lab focuses on two Instana features.  The first is Synthetic Monitoring.  The second is the Action Catalog where you can create and execute automated corrective actions.
 Key capabilities that will be exercised are:
-- Setting up the synthetic "Point of Presence"  This is the component that executes the synthetic test.
+- Setting up the Synthetic "Point of Presence"  This is the component that executes the synthetic test.
 - Single REST API synthetic test
 - Using javascript to execute a scripted synthetic test that exercises multiple REST calls
 - Synthetic test using a simple Selenium IDE script
 - Setup Smart Alerts against synthetic tests
 - Create and execute "Actions" via the Action Catalog
 
-Before we can create any synthetic tests, we must first setup a synthetic "Point of Presence" or "PoP server" to playback our synethetic tests.
-Many customers deploy two or more "Points of Presence" so that they can compare the response time and availability from different network zones.
-For example, if a PoP server running in the LAN network performs well, but a PoP server located on a WAN network is performing poorly, it is clear indication that the problem is the network or load balancer rather than the application.
-
-In the lab, we will begin by installing the "Synethetic Point of Presence".
+First, In this lab, we will begin by installing the Synthetic "Point of Presence".

@@ -6,13 +6,14 @@ sidebar_position: 50
 
 # Synthetic test with Selenium IDE script
 
-Instana Synthetic monitoring also support synthetic testing using browser script, such as Selenium IDE scripts. 
+Instana Synthetic monitoring also support synthetic testing using browser script, such as Selenium IDE scripts. The Selenium IDE is a plugin in the browser which enable recording of a test script via pointing and clicking on the website in the browser. 
+You can also combined Selenium IDE scripts and Javascripts for more advanced capabilities, in which you may refer to the following URL:
+ https://www.ibm.com/docs/en/instana-observability/current?topic=scripts-selenium-ide
+
 In this lab exercise, you will learn how to include a pre-defined Selenium IDE script in a synthetic test. 
 
 :::note
-Due to the consideration of the lab content and time allocation, we had prepared an earlier recorded Selenium IDE script for use in this lab exercise. This pre-recorded script is a simple script on shopping for robots in Stan's Robot Shop. 
-For more advanced and advanced configurations, you may refer to:
- https://www.ibm.com/docs/en/instana-observability/current?topic=scripts-selenium-ide
+Due to the consideration of the lab content and time allocation, we had prepared an earlier recorded Selenium IDE script for use in this lab exercise. This pre-recorded script is a simple script on shopping for robots in Stan's Robot Shop.
 :::
 
 ## Create a new test with Selenium IDE script
@@ -33,11 +34,11 @@ In this **Step 2: Request details**, click on the **Choose file** icon.
 
 ![](images/ChooseFile.png)
 
-In the File Upload window, select the **RobotShopping.side** file located in the Documents directory of ibmuser. Then, click the **Open** button.
+In the File Upload window, select the **RobotShopping.side** file located in the Documents folder of ibmuser directory. Then, click the **Open** button.
 
 ![](images/FileUpload.png)
 
-Back at the **Step 2: Request details**, select the Point of Presence that you have just created previously in Lab3. Then click on **Next** button.
+Back at the **Step 2: Request details**, select the Point of Presence that you had just created previously in Lab3. (The PoP listed in the UI may not be the same name as of the PoP you had created previously). Then click on **Next** button.
 
 ![](images/SelectPoP.png)
 
@@ -59,8 +60,14 @@ It will take a couple of minutes for the synthetic tests to begin executing.
 
 *HINT* You may need to click on the top right **Live** button, to view test results.
 
-On the screen, you can see a summary of the synthetic results.  You can also click on the **Results** tab and see the detailed results of each synthetic test.
+On the screen, you can see a summary of the synthetic test results.  
+
+![](images/Summary.png)
+
+Next, on the **Results** tab, and you can click on anyone of the test results in the list to see the detailed result of the synthetic test.
 
 ![](images/Results.png)
 
-You have now created a synthetic test using a simple Selenium IDE script.
+![](images/DetailedResults.png)
+
+In summary, you have now learned how to create a synthetic test using browser script by selecting a simple pre-recorded Selenium IDE script.
