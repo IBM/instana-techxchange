@@ -27,9 +27,9 @@ Credential information is located in file *synthetic-monitoring-lab.txt* in fold
 :::
 
 
-At this point, the Instana server is capable of running and displaying synthetic tests, but you still need to setup the "Synthetic Point of Presence" component.
+At this point, the Instana server is ready to run and display synthetic tests, but we need to setup the Synthetic Point of Presence component to playback the scripts.
 
-If Helm wasn't installed during previous labs, install it on bastion node now with command:
+We are using Helm to install the Synthetic Point of Presence. Thus, install it on **K8 Control** VM with the following command:
 ```bash
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ```
@@ -46,28 +46,30 @@ Use **Simple** tab for Helm command.
 
 You will need to edit the information contained in the helm command, so copy and paste the text into a temporary file where you can use an editor such as **vi** to edit the content.
 
-The default helm command will look as follows. Some of the parameters have been replace with "xxx" for security reasons.
+The default helm command will look as follows. Some of the parameters have been replace with "xxx" as they are sensitive information, thus not shown in the lab guide.
 ```sh
 helm install synthetic-pop \
 	--repo "https://agents.instana.io/helm" \
 	--namespace <namespace> \
 	--create-namespace \
-	--set downloadKey="<xxx>" \
+	--set downloadKey="xxx" \
 	--set controller.location="<yourLocationName>;<yourLocationDisplayName>;<yourLocationCountry>;<yourLocationCity>;0;0;<yourLocationDescription>" \
 	--set controller.clusterName="<yourClusterName>" \
-	--set controller.instanaKey="4I720vhbzfjAnNS4cuKnNl" \
+	--set controller.instanaKey="xxx" \
 	--set controller.instanaSyntheticEndpoint="https://xxx" \
 	--set redis.tls.enabled=false \
 	--set redis.password="<yourPassword>" \
 	synthetic-pop
   ```
 
-For Synthetic Point of Presence we need to modify some of the parameters and provide one additional parameter.  
+For Synthetic Point of Presence we need to modify some of the parameters.  
 
 
 - Modify the **controller.clusterName** parameter and provide a meaningful name.
-- In the **controller.location**, specify a name, display name, country, etc. for your "Point of Presence".   The "0;0" parameter represents the longituded and latitude of the "Point of Presence".  These parameters help identify the Point of Presence when  there multiples deployed.
-- In the 	**controller.instanaKey**, please specify exactly this value "4I720vhbzfjAnNS4cuKnNl". This is related to the known issue with Instana backend version we are using for this lab. In the real-life scenario, the proper download and Instana key will be populated on the Instana UI.
+- For the **controller.location**, specify a name, display name, country, etc. for your "Point of Presence".   The "0;0" parameter represents the longitude and latitude of the "Point of Presence".  These parameters help identify the Point of Presence when  there multiples deployed.
+- The **controller.clusterName** is optional
+- The **controller.instanaSyntheticEndpoint** is the Synthetic acceptor in the Instana backend server
+- For the	**controller.instanaKey**, please specify exactly this value "4I720vhbzfjAnNS4cuKnNl". This is related to the known issue with Instana backend version we are using for this lab. In the real-life scenario, the proper download and Instana key will be populated on the Instana UI.
 - Finally, enter a redis password.  This can be any value since you are setting the password.
 
 :::note
@@ -81,8 +83,8 @@ helm install synthetic-pop \
      --repo https://agents.instana.io/helm  \
      --namespace instana-synthetic \
      --create-namespace \
-     --set downloadKey="<xxx>" \
-     --set controller.location="Local;on Instana cluster;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
+     --set downloadKey="xxx" \
+     --set controller.location="Local;K8 Control VM;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
      --set controller.instanaKey="xxx" \
      --set controller.clusterName="MyInstanaCluster" \
      --set controller.instanaSyntheticEndpoint="https://xxx/synthetics" \
@@ -91,7 +93,7 @@ helm install synthetic-pop \
      synthetic-pop
 ```
 
-Copy the helm command from the text file and paste it into a terminal window on the Bastion node. This will execute the helm chart.
+Copy the helm command from the text file and paste it into a terminal window on the **K8 Control** node. This will execute the helm chart.
 
 You should see an output similar to the following:
 
@@ -101,8 +103,8 @@ You should see an output similar to the following:
 >     --namespace instana-synthetic \
 >     --create-namespace \
 >     --set downloadKey="xxx" \
->     --set controller.location="Local;on Instana cluster;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
->     --set controller.instanaKey="4I720vhbzfjAnNS4cuKnNl" \
+>     --set controller.location="Local;K8 Control VM;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
+>     --set controller.instanaKey="xxx" \
 >     --set controller.clusterName="MyInstanaCluster" \
 >     --set controller.instanaSyntheticEndpoint="https://xxx/synthetics" \
 >     --set redis.tls.enabled=false \
@@ -114,7 +116,7 @@ NAMESPACE: instana-synthetic
 STATUS: deployed
 ```
 
-After the Synthetic point of presence is installed verify its appearence in the interface:
+After the Synthetic Point of Presence is installed, you can verify it listed at the **Locations** tab. You may need to wait a few short minutes, then click again **Synthetic Monitoring** -> **Locations** for your newly installed PoP to be listed in the **Locations** tab.
 
 ![](images/PointOfPresence_Location-new.png)
 
@@ -127,9 +129,9 @@ Expected results should look similar to the below:
 
 ![](images/pop-syn-pods.png)
 
-Confirm that the pods are all running.
+Confirm that the pods are all running. You may need to wait a few minutes and check again that the pods' statuses are all running.
 
-The last step is to adjust the internal hosts configuration of the Instana Synthetic PoP. This has to be done because of later need to run a script which will make a call to the Instana API.
+The last step is to update the internal hosts configuration of the Instana Synthetic PoP since we do not have a DNS being setup in this lab. This has to be done because in the next lab, we need to run a script which will make a call to the Instana API.
 
 Please apply the below command
 

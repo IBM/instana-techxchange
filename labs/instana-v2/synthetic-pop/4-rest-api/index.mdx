@@ -6,10 +6,8 @@ sidebar_position: 40
 # REST API
 
 ## REST API Synthetic Tests
-In the exercise we will follow creating a test of series of probes and as example will monitor number of managed objects. 
-
-We will interrogate Instana backend as an example of external application.
-
+In the real world, you can setup REST API Synthetic tests to monitor your application's availability via interval-defined scheduling to interrogate the applications' REST APIs. This would not only test the API function availability but also the response times by the REST API.
+In this lab exercise we will create synthetic tests that proactively tests the REST APIs to the Instana backend server. We will first create Simple REST API test, then followed by a Scripted REST API test.
 
 ### Simple REST API test
 Let's begin by executing a simple REST API test.  This will be a single REST GET request.
@@ -33,7 +31,7 @@ http://10.0.0.15:8080/api/cart/metrics
 
 This could be any REST request. In this case, we are testing the API call to get the cummulative count of robots in shopping cart within the **Stan's Robot Shop** application.
 
-Then, select your **Point of Presence** location and click **Next**.  This allows you to choose the location(s) where you want your synthetic script to execute.  In the lab, you only have 1 location that you can select.
+Then, select your **Point of Presence** location and click **Next**.  This allows you to choose the location(s) where you want your synthetic script to execute.  In this lab, the screenshot shown 'Synthetic Monitoring PoP' being selected, but you should choose the PoP that you had created in previous lab exercise.
 
 ![](images/addSynthetics4-new.png)
 
@@ -91,7 +89,7 @@ You will need to save your REST API Token so that you can use it in the javascri
 ![](images/APIToken-new.png)
 
 When you're back to the API Tokens page, you can also click on the **eye** icon, you'll see the **API Token** itself and also an icon that allows you to copy the API Token in the event you missed the token earlier, or forgot the token in the future.
-The API Token is now in your clipboard, but it probably makes sense to save it to a file so that you can access it later.
+The API Token is now in your clipboard, but it probably makes sense to save it to a file so that you can access it later. For example, in the folder /user/ibmuser/Documents, you can create a new file (you can give any name for your ew file) and paste the token information in that file.
 
 ![](images/APIToken2-new.png)
 
@@ -238,3 +236,7 @@ Failed Run(Exception)
 Error Message
 We have license to monitor 1 host and we have reached 4 already! 
 ```
+
+By now, you had learned how to create both a Simple REST API test and a Scripted REST API test in Instana's Synthetic Monitoring. Instana can also support more advanced API script, which you can refer to this URL for further information.
+
+https://www.ibm.com/docs/en/instana-observability/current?topic=monitoring-using-api-scripts

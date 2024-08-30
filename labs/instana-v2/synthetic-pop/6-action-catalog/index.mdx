@@ -6,15 +6,15 @@ sidebar_position: 70
 
 # Action Catalog
 
-Instana include a capability called the **Action Catalog** which allows you to execute corrective actions in order to solve problems in an automated way.  
+The Instana automation framework supports automating actions to diagnose and remediate events. This automation capability called the **Action Catalog** allows you to execute corrective actions in order to solve problems in an automated way.
+Thus, it can avoid possible user error via this scripted automation solution.
+The approach allows you to reduce downtime by fixing known issues as quickly as possible. You can also have those automated actions execute automatically whenever specific Events trigger.
 
-The approach allows you to reduce downtime by fixing known issues as quickly as possible. There is no need to leave the Instana user interface. In the near future, you will also be able to have those 
-automated actions execute automatically whenever specific Events trigger.
+An example might be that when the log file of an application has consumed all available disk space, SREs may restore service by deleting logs or extending space with one click from Instana UI.
 
-An example might be that when the log file of an application has consumed all available disk space, SREs may restore service by deleteing logs or extending space with one click from Instana UI.
-
-There are multiple ways to execute the Actions. Instana can be integrated with tools like Ansible to execute complex automations remotely. It supports the execution of webhooks.  
-It supports the integration of web pages so that you can point to a manual runbook.  And, it provides the ability to execute scripts locally on the Agent machine.
+There are multiple ways to execute the Actions. Instana can be integrated with tools like Ansible to execute complex automations remotely.
+It supports the integration of web pages so that you can point to a manual runbook, as well as support execution of webhooks.
+It also provides the ability to execute scripts locally on the Agent machine to remediate the issue automatically.
 
 In this lab we will do the following:
 
@@ -34,9 +34,9 @@ Notice that the **Action Catalog** supports **Tags**.  In this lab we will not b
 
 Select the Action **Type** dropdown and choose the **Script** option.  Notice that there are a few other options.  
 The **Documentation Link** is used to associate a manual runbook into Instana.  
-The **HTTP** option is used to automate the execution of a REST API call.
-The **GitHub issue** is to open, close, or add comment to GitHub issue.
-The **GitLab issue** is to open, close, or add comment to GitLab issue.
+The **HTTP** option is used to automate the execution of a REST API call.  
+The **GitHub issue** is to open, close, or add comment to GitHub issue.  
+The **GitLab issue** is to open, close, or add comment to GitLab issue.  
 The **Jira task** is to open, close or add comment to Jira task.
 
 ![](images/selectScript.png)
@@ -57,7 +57,7 @@ The results should look as follows:
 
 We won't be using it in this lab, but notice that there is a **Parameters** section of the **Action** where you can pass parameters into your script.
 
-Next, create on **Create** button to create your new action.
+Next, click on **Create** button to create your new action.
 
 
 In the next task, you will decide which Events will be associated with your automation.  The idea is that you only want your automation to appear when certain event trigger.
@@ -70,6 +70,12 @@ To create a policy, click on **Policies** tab, then **New Policy**
 Key in the policy name and the description.
 
 ![](images/PolicyName.png)
+
+:::note
+You'll notice that it is also possible to configure to use tags in the policy.
+Usually we will select Events to be associated with the trigger, but tags can be used by AI analytics to assigned them based on keywords.
+Tags is optional in this Policy configuration, and not used in this lab.
+:::
 
 Then, scroll down to **2. Trigger Configuration** and click on **Add Event Trigger**
 
@@ -127,7 +133,8 @@ com.instana.plugin.action.script:
 Notice that you can specify any directory where you want the script to execute.   And, you can specify the user account that you want the script to run-as.
 
 
-Go back to the Instana user interface.  Within the Action Catalog, you will see your Action.  Notice that you can manually execute the Action by selecting the 3dot icon, followed by **Test**
+Go back to the Instana user interface.  Within the Action Catalog, you will see your Action.
+Notice that you can manually execute the Action by selecting the 3dot icon, followed by **Test** BUT don't click on it as we are not executing the action manually now.
 
 ![](images/manuallyExecute.png)
 
@@ -159,7 +166,7 @@ The Instana agent includes the Automation Action Ansible sensor, but is disabled
 Recalling to our setup diagram for this lab, we had already installed/configured RedHat Ansible Automation Platform on the **student** node, and also had edited the agent's configuration.yaml file in the **student** node (ip_addr 10.0.0.100) to communicate with the Red Hat Ansible Automation Controller.
 
 ```yml
-com.instana.plugin.action.nsible:
+com.instana.plugin.action.ansible:
   enabled: true  # by default is false
   url: https://10.0.0.100  # Ansible url
   token: XXXXXXXXXXXXXXXXX # Ansible connection token, generated from the Ansible UI for the Ansible user that Instana will use for connection
@@ -180,7 +187,9 @@ com.instana.plugin.action.nsible:
 We did not use vault for the token since this is just a lab exercise, but vault should be used in a production environment as a security best practice.
 :::
 
-When this Automation Action Ansible sensor is enabled, it will automatically create a docker container which will host the automation connector to communicate with the Ansible controller. It will then sync the playbooks from Ansible into Instana's Action Catalog.
+When this Automation Action Ansible sensor is enabled, it will automatically create a docker container which will host the automation connector to communicate with the Ansible controller.
+Making use of the token in the configuration as the user to login to Ansible, it will then sync from Ansible, whichever playbooks the token user has authorized access to, into Instana's Action Catalog.
+Any subsequent new playbooks in Ansible that are accessible by the token user, will also be automatically sync over to Instana from time to time.
 
 ![](images/dockerConnector.png)
 
@@ -212,11 +221,11 @@ Back to Automation view, you can click on **Action History** to view the just in
 
 ![](images/ActionHistory1.png)
 
-Now, let's verify the RobotShop catalog is indeed stop by refreshing the homepage of **Stan's Robot Shop**. You will notice that the all the Categories listing is missing, as the catalog's docker container is down.
+Now, let's verify the RobotShop catalog is indeed stopped by refreshing the homepage of **Stan's Robot Shop**. You will notice that the all the Categories listing is missing, as the catalog's docker container is down.
 
 ![](images/RobotShop_withoutCatalog.png)
 
-Next, let's start back again the RobotShop catalog container again. From the **Action Catalog**, click on the 3dots icon at the far right of **Start RobotShop Catalog**, and select **Test**
+Next, let's start back the RobotShop catalog container again. From the **Action Catalog**, click on the 3dots icon at the far right of **Start RobotShop Catalog**, and select **Test**
 
 ![](images/RobotShop_startCatalog.png)
 
