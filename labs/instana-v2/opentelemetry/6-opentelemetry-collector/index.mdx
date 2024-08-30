@@ -20,6 +20,10 @@ OpenTelemetry collector objectives:
 - Extensibility: Customizable without touching the core code.
 - Unification: Single codebase, deployable as an agent or collector with support for traces, metrics, and logs.
 
+:::info
+In this lab, we will be using OpenTelemetry Collector Contrib, which source-code can be found here https://github.com/open-telemetry/opentelemetry-collector-contrib
+:::
+
 ## Instana backend - configuration
 
 Instana Logging feature is available as a beta functionality, which means, it requires additional configuration inside the Instana backend. In order to enable logging feature, please follow the below steps:
@@ -101,6 +105,15 @@ There are two key elements of the configuration file:
 
 ![collector004](images/collector-004.png)
 
+:::info
+Please note, that the Otel data can also be sent to directly to the Instana backend
+:::
+
+Other elements of the configuration file (based on the Otel protocol):
+- receivers - which element is providing the data to the Otel model. There are many different receivers, depending on the file/data types,
+- processors - what are the steps required before sending Otel data, for example data cleaning, re-formatting, enriching, etc.
+- exporters - which system should receive the Otel data, in our case that's Instana backend 
+
 The file is ready to be used by the OpenTelemetry collector, let's close the configuration file:
 
 ```bash
@@ -121,6 +134,7 @@ The service is now ready to accept the log changes. Please keep this terminal wi
 
 ## Log content creation
 
+The above configuration will tail the desired log file content. Any new entries that are not filtered out by our configuration settings will be captured by the collector. 
 Now, let's simulate new log entries creation - the goal is to be sure that OpenTelemetry Collector will send the log data, throught the Instana agent to the Instana backend.
 
 Please open a new terminal and login (again) to the "kmaster" host. We need two active sessions, because the previous one keeps the OpenTelemetry Collector up and running. Please login to the "kmaster" host:
@@ -153,7 +167,12 @@ It was shown, that Instana can accept custom log content, using external OpenTel
 
 ## Summary
 
-This section concludes the Lab.
+This section concludes the Lab. In this section you have learned:
+1. How to setup, configure and run the OpenTelemetry Contrib Collector,
+2. How to configure traditional Instana Agent to accept the Otel communication,
+3. How to explore the Instana Analytics/Logs UI 
+
+
 
 :::info
 Please review additional information about OpenTelemetry Collector filelog receiver https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver
