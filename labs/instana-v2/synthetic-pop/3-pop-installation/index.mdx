@@ -11,7 +11,7 @@ We will be installing the Synthetic Point of Presence into the **K8 Control** Ku
 
 From the browser, open **Student VM** console
 
-![](images/student-vm-new.png)
+![](images/student-vm-new2.png)
 
 Open a terminal in the Student VM
 
@@ -26,15 +26,20 @@ ssh root@10.0.0.20
 Credential information is located in file *synthetic-monitoring-lab.txt* in folder /home/ibmuser/Documents in **Student VM**.
 :::
 
+There is already a pre-installed Point of Presence (PoP) in the **K8 Control** VM as a backup/trial PoP for this lab. We will first remove this PoP as it is taking up resources in the VM.
+Issue this command at the **K8 Control** command window.
 
-At this point, the Instana server is ready to run and display synthetic tests, but we need to setup the Synthetic Point of Presence component to playback the scripts.
+```bash
+kubectl scale deployment -n synthetic-pop --replicas=0 --all
+```
+Next, we will install and setup the Synthetic Point of Presence component to playback the test scripts.
 
 We are using Helm to install the Synthetic Point of Presence. Thus, install it on **K8 Control** VM with the following command:
 ```bash
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ```
 
-In the Student VM, open the Instana UI in the browser
+In the Student VM, open the Instana UI in the browser. You may click on the **Instana** quick-link on the browser.
 
 ![](images/instana-ui-new.png)
 
@@ -66,11 +71,10 @@ For Synthetic Point of Presence we need to modify some of the parameters.
 
 
 - Modify the **controller.clusterName** parameter and provide a meaningful name.
-- For the **controller.location**, specify a name, display name, country, etc. for your "Point of Presence".   The "0;0" parameter represents the longitude and latitude of the "Point of Presence".  These parameters help identify the Point of Presence when  there multiples deployed.
-- The **controller.clusterName** is optional
-- The **controller.instanaSyntheticEndpoint** is the Synthetic acceptor in the Instana backend server
-- For the	**controller.instanaKey**, please specify exactly this value "4I720vhbzfjAnNS4cuKnNl". This is related to the known issue with Instana backend version we are using for this lab. In the real-life scenario, the proper download and Instana key will be populated on the Instana UI.
-- Finally, enter a redis password.  This can be any value since you are setting the password.
+- For the **controller.location**, specify a location name, display name, country, etc. for your "Point of Presence".   The "0;0" parameter represents the longitude and latitude of the "Point of Presence".
+These parameters help identify the Point of Presence when there are multiples deployed.
+- The **controller.instanaSyntheticEndpoint** is the Synthetic acceptor in the Instana backend server. Leave this value as it is.
+- Finally, enter a redis password.  This can be any value since you are setting the password. Minimum password length is 10
 
 :::note
 - `--set seccompDefault=true` This parameter is required for OpenShift versions 4.11 and above. This step is not required for our labs as we are using K8S environment
@@ -84,7 +88,7 @@ helm install synthetic-pop \
      --namespace instana-synthetic \
      --create-namespace \
      --set downloadKey="xxx" \
-     --set controller.location="Local;K8 Control VM;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
+     --set controller.location="TechX Lab VM;Lab PoP;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
      --set controller.instanaKey="xxx" \
      --set controller.clusterName="MyInstanaCluster" \
      --set controller.instanaSyntheticEndpoint="https://xxx/synthetics" \
@@ -103,7 +107,7 @@ You should see an output similar to the following:
 >     --namespace instana-synthetic \
 >     --create-namespace \
 >     --set downloadKey="xxx" \
->     --set controller.location="Local;K8 Control VM;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
+>     --set controller.location="TechX Lab VM;Lab PoP;Serbia;Belgrade;39.54;116.23;A test Synthetic Point of Presence" \
 >     --set controller.instanaKey="xxx" \
 >     --set controller.clusterName="MyInstanaCluster" \
 >     --set controller.instanaSyntheticEndpoint="https://xxx/synthetics" \
@@ -116,7 +120,10 @@ NAMESPACE: instana-synthetic
 STATUS: deployed
 ```
 
-After the Synthetic Point of Presence is installed, you can verify it listed at the **Locations** tab. You may need to wait a few short minutes, then click again **Synthetic Monitoring** -> **Locations** for your newly installed PoP to be listed in the **Locations** tab.
+After the Synthetic Point of Presence is installed, you can verify it listed at the **Locations** tab.
+You may need to wait a few short minutes, then click again **Synthetic Monitoring** -> **Locations** for your newly installed PoP to be listed in the **Locations** tab.
+Your newly created PoP named **Lab PoP** may appear offline in the first few moments, but will eventually be online.
+You should be selecting this PoP in your subsequent lab exercises.
 
 ![](images/PointOfPresence_Location-new.png)
 
@@ -127,7 +134,7 @@ kubectl get pods --namespace=instana-synthetic
 
 Expected results should look similar to the below:
 
-![](images/pop-syn-pods.png)
+![](images/pop-syn-pods-new.png)
 
 Confirm that the pods are all running. You may need to wait a few minutes and check again that the pods' statuses are all running.
 
@@ -139,6 +146,6 @@ Please apply the below command
 kubectl patch deployment synthetic-pop-javascript-playback-engine -n instana-synthetic --patch '{"spec": {"template": {"spec": {"hostAliases": [{"hostnames": ["student-labs.instana.training"],"ip": "10.0.0.10"}]}}}}'
 ```
 
-After a few minutes, the list of pods should look like the below
+After a few minutes, ensure all the pods are running, and the list of pods should look like the below
 
-![](images/pop-syn-pods.png)
+![](images/pop-syn-pods-new.png)
