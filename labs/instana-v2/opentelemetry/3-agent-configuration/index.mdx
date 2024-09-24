@@ -29,11 +29,13 @@ Sending Otel data through the Instana Agent can be useful for some implementatio
 
 By default, the OpenTelemetry data ingestion in the Instana host agent is deactivated. That is why, you have to enable the OpenTelemetry configuration. 
 
-Login to the "docker" Virtual Machine by using the following command
+Please use the "Student" VM, open the "Terminal" application and login to the "docker" Virtual Machine by using the following command:
 
 ```sh
 ssh root@docker
 ```
+
+Password is "Passw0rd"
 
 next, proceed to the opentelemetry-demo directory
 
@@ -52,7 +54,7 @@ Please note, that the default location for the configuration.yaml file is in the
 vim configuration.yaml
 ```
 
-To enable the reception of the OpenTelemetry data in the host agent, make sure, these two enabled: true values are populated in the configuration.yaml file of the host agent:
+To enable the reception of the OpenTelemetry data in the host agent, make sure, these two "enabled: true" values are populated in the configuration.yaml file of the host agent. Please change the values from "false" to "true"
 
 ```bash
 com.instana.plugin.opentelemetry:
@@ -147,7 +149,9 @@ The results of these commands should confirm, that ports 4317 and 4318 are liste
 
 ### Check Instana UI 
 
-Let's move to the Instana UI and make sure, the agent is reporting content to the Instana backend. Open the Instana UI in the browser and navigate to Settings -> Agents as shown on the below screen:
+Please go back to the "Student" VM, open a Firefox browser and let's move to the Instana UI (you will find the link in the bookmark bar). 
+
+Make sure, the agent is reporting content to the Instana backend. Open the Instana UI in the browser and navigate to Settings -> Agents as shown on the below screen:
 
 ![agent3](images/docker-agent-install5.png)
 
