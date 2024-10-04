@@ -21,7 +21,7 @@ on a single server configuration or a 3 server configuration. Self-Hosted is wha
 Under the covers, Standard Edition uses K3S kubernetes. But, nearly all of the kubernetes complexity is managed for
 our customers via the use of the _stanctl_ command.   This option is the perferred self-hosted
 deployment for small and medium sized deployments.  Standard Edition is a multi-tenant solution
-that supports all recent Instana enhancements.
+that supports all recent Instana enhancements.  The virtual machine(s) required to deploy Standard Edition can be installed on-prem or in a public cloud.
 - **Custom Edition** with the cloud native backend components running in
   a kubernetes cluster and the datastores running either distributed across
   multiple servers or in the kubernetes cluster. This configuration is
@@ -30,10 +30,8 @@ that supports all recent Instana enhancements.
   or open a [SWAT Request](http://ibm.biz/automation-swat) request (IBM
   internal) or contact your IBM sales representative.
 - **Docker** self-hosted is a _Containerized_ deployment that does not
-  support multi-tenancy. Of course, on-premises could be deployed into a public cloud. 
-  The Docker deployment offers both a single server and a 2 server configuration. 
-  This option is no longer strategic and lacks a few key capabilities including
-  logging, synthetics, and the Automation catalog.
+  support multi-tenancy. The Docker deployment offers both a single server and a 2 server configuration. 
+  This option is no longer strategic and lacks a few key capabilities including logging, synthetics, and the Automation catalog.
 
 :::tip
 
@@ -135,8 +133,28 @@ Prior to setting up Instana, you must setup DNS entries and aliases for the Inst
 The required DNS entries are documented [here](https://www.ibm.com/docs/en/instana-observability/current?topic=cluster-preparing#dns-settings), but have already been setup in your lab environment.
 
 
+
 Once, the prerequisites have been setup, you are ready to install the Instana server.  We will be performing an air-gapped installed.
 :::
+
+Before going to the next step, we have to do a little cleanup of the environment.   We accidentally left a couple of files in the environment.
+
+Begin by removing the **.stanctl** directory by typing:
+```sh
+rm -f /root/.stanctl
+```
+
+This directory contains an instana.yaml file that keeps track of your configuration settings, including the Download Key and Sales Key.
+
+Next, uninstall the **stanctl** command by typing:
+
+```sh
+yum remove stanctl
+```
+
+You should see output similar to what is shown below.
+
+![terminal](images/removeStanctl.png)
 
 ---
 
@@ -158,11 +176,9 @@ First, you must setup the yum repository. Then, install the **stanctl** command 
 
 Begin by setting a DOWNLOAD_KEY environment variable.  When you get an Instana license, you are given a Download/Agent Key and a Sales Key.
 
-In this lab, you can get the Download Key from the /media/readme.txt file
+In this lab, you can get the Download key from the Box note that is reference in the PDF introduction.  You should already have this open in a browser.
 
-```sh
-cat /media/readme.txt
-```
+![terminal](images/boxNote.png)
 
 Copy and paste the Download Key and run the following command.  But, make sure you replace **<download_key>** with the actual download key from the readme.txt file.
 
@@ -171,6 +187,9 @@ export DOWNLOAD_KEY=<download_key>
 ```
 
 Next execute the following command.  This will add the Instana repository to your list of Red Hat yum repositories.  Similar commands are documented for Debian/Ubuntu and SUSE Linux.
+
+The most reliable way to run this command is to open the readme.txt file that is contained in the Box folder.  From the readme.txt file, copy the section titled 
+**Setting up the yum repository** and paste it into the same terminal window where you setup the DOWNLOAD_KEY environment variable.
 
 ```sh
 cat << EOF > /etc/yum.repos.d/Instana-Product.repo
@@ -183,6 +202,10 @@ gpgkey=https://_:$DOWNLOAD_KEY@artifact-public.instana.io/artifactory/api/securi
 repo_gpgcheck=1
 EOF
 ```
+
+Copy by selecting the text within the readme file as shown below.  Then, right click and **paste** into the terminal window of the instana VM.
+
+![terminal](images/repo.png)
 
 Now, install the **stanctl** command by typing:
 
@@ -253,9 +276,10 @@ We're now ready to initiate the installation. Issue the following command:
 stanctl up --air-gapped --core-smtp-from lab@techxchange.com --core-smtp-host instana.training --core-smtp-port 25 --timeout 60m0s
 ```
 
-This command will install the Instana backend (server) and configure the SMTP settings.
+This command will install the Instana backend (server) and configure the SMTP settings using an air-gapped installation.  Notice that no air-gapped package was specified.
+This is due to the fact that you imported the air-gapped package in the previous step.
 
-After issuing the command, you will be prompted for a number of required parameters.  The Download Key and Sales Key can be found in the /media/readme.txt file.
+After issuing the command, you will be prompted for a number of required parameters.  The Download Key and Sales Key can be found  the Box note that is referenced in the PDF introduction.
 
 Please respond to the following prompts as seen below:
 ![installPrompts](images/installPrompts.png)

@@ -17,7 +17,7 @@ import MultiChoiceQuestion from "../../../_common/components/multi-choice.jsx"
 <MultiChoiceQuestion
   questionNumber="1"
   question="Which of the following is not an Instana on-premises deployment option?"
-  answers={["Kubernetes", "Single Server", "Two Server", "Three Server"]}
+  answers={["Kubernetes", "Single Server", "Three Server", "Four Server"]}
   correctAnswer="Three Server"
 />
 
@@ -30,14 +30,14 @@ import MultiChoiceQuestion from "../../../_common/components/multi-choice.jsx"
 
 <MultiChoiceQuestion
   questionNumber="3"
-  question="Feature Flags for Instana Server deployed on Docker can be enabled via which configuration file?"
+  question="Feature Flags for Instana Standard Edition Server using which method?"
   answers={[
-    "settings.yaml",
-    "instana-config.hcl",
-    "configuration.yaml",
-    "settings.hcl",
+    "Edition the /root/.stanctl/settings.yaml file",
+    "Running a command similar to this and specifying the correct feature flag:  instana backend apply  --core-feature-flags feature.synthetics.enabled=true"",
+    "Editing the configuration.yaml file",
+    "Running a command similar to this and specifying the correct feature flag:  stanctl backend apply  --core-feature-flags feature.synthetics.enabled=true"
   ]}
-  correctAnswer="settings.hcl"
+  correctAnswer="Running a command similar to this and specifying the correct feature flag:  stanctl backend apply  --core-feature-flags feature.synthetics.enabled=true"
 />
 
 <MultiChoiceQuestion
@@ -49,7 +49,7 @@ import MultiChoiceQuestion from "../../../_common/components/multi-choice.jsx"
 
 <MultiChoiceQuestion
   questionNumber="5"
-  question="Which of the following is not a supported technology for deploying the Instana Agent on OpenShift?"
+  question="Which of the following is not a supported technology for deploying the Instana Agent on kubernetes?"
   answers={["YAML", "Bash Script", "Operator", "Helm Chart"]}
   correctAnswer="Bash Script"
 />

@@ -142,7 +142,13 @@ vi /opt/instana/agent/etc/instana/configuration.yaml
 
 This configuration.yaml file has a number of parameters that can be configured.  For example, you can define a **zone** where the VM will appear in the Infrastructure view.
 
+:::caution
+
 Please remember that yaml files are very sensitive to spacing.  Each line must be indented by 0, 2, 4, 6, spaces, etc. and must be indented with spaces and not tabs.
+
+When you are finished with your editing, the sections should look exactly like the screen captures in the lab guide.  Pay careful attention to the spacing on each line.
+
+:::
 
 Search for **Hardware & Zone** by typing:
 ```sh
@@ -238,7 +244,12 @@ In the lab environment, no additional configuration is necessary.
 :::
 
 
-From the **Installing Instana Agents** screen we will be selecting an option to Install the Agent in a kubernetes environment.
+From the **Installing Instana Agents** screen we will be selecting an option to Install the Agent in a kubernetes environment. 
+But first, you must navigate back to the main **Agent deployment** window.
+
+In the Instana GUI, click on **Agent deployment**
+
+![Agent Deployment](images/agentDeployment.png)
 
 :::tip
 
@@ -340,7 +351,7 @@ There are sensors monitoring the cassandra database, kafka, elasticsearch, and m
 
 Feel free to drill into some of the sensors to view the health and performance of the Instana server.
 
-In addition, if you click on **Platformm** and then **Kubernetes**, you will see that you are monitoring two kubernetes clusters.
+In addition, if you click on **Platform** and then **Kubernetes**, you will see that you are monitoring two kubernetes clusters.
 The first cluster is the self-monitoring for your Instana server (backend) and the other cluster is the k8control kubernetes cluster.
 
 You can click on the blue links with the cluster names to drill into the cluster details.
