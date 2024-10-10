@@ -106,6 +106,8 @@ When prompted, enter "Passw0rd" to specify the root password on the Instana serv
 
 You should now be logged into the Instana server virtual machine as the root user.
 
+Note:  The commands used in this section will be executed as the root user.  But, Instana supports the use of sudo to execute the commands.
+
 
 
 Prior to installing Instana, there are a number of prerequisites that need to be in place.  
@@ -141,7 +143,7 @@ Before going to the next step, we have to do a little cleanup of the environment
 
 Begin by removing the **.stanctl** directory by typing:
 ```sh
-rm -f /root/.stanctl
+rm -rf /root/.stanctl
 ```
 
 This directory contains an instana.yaml file that keeps track of your configuration settings, including the Download Key and Sales Key.
@@ -227,8 +229,9 @@ stanctl version 1.2.1 (commit=a3a91ef3db195cfbba3e4b9415d4afa610c49e12, date=202
 This tells you that you have version 1.2.1 of the stanctl command installed.  This version is actually slightly old.  We have intentionally pinned
 this version in the yum repository to ensure that the stanctl command version matches the air-gapped package that we have downloaded.
 
-We recommend pinning the version to ensure that the **stanctl** command does not accidentally get upgraded when you upgrade the operating system.
-
+We recommend configuring the OS so that the **stanctl** command does not accidentally get upgraded when you upgrade the operating system. 
+Instructions for disabling the automatic updates can be found here, but we will not be executing them during this lab: 
+https://www.ibm.com/docs/en/instana-observability/current?topic=edition-installing#installing-stanctl-command-line-tool
 
 
 
@@ -291,6 +294,7 @@ Next, you will be prompted for the _Download Key_.  When prompted, copy and past
 You will be prompted for the _Sales key_.  At the prompt, copy and paste the **Sales Key** from the /media/readme.txt file.
 
 Next, enter the _domain_ for the Instana server.  This is typically the fully qualified hostname of the Instana server and needs to be registered in DNS.   
+
 For this lab, type **instana.training**.
 
 Enter the _tenant name_ for this Instana server.  Instana is multi-tenant, so you must specify a tenant name.   Type **labs** for the _tenant name_.
@@ -413,6 +417,8 @@ For this lab, let's enable the synthetics capabilities.  This requires multiple 
 ```sh
 stanctl backend apply  --core-feature-flags feature.synthetics.enabled=true feature.synthetic.browser.create.test.enabled=true feature.synthetic.browser.script.enabled=true
 ```
+
+For your convenience, this command has been placed into the readme.txt file in box where you can copy/paste.
 
 You will see output similar to what's shown below indicating that you have successfully setup the feature flag.
 

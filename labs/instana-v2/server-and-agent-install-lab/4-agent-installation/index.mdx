@@ -42,7 +42,7 @@ the excerpt from the
   By default, dynamic host agents use the Instana repository to pull updates,
   but it is possible to
   [set up your own managed mirror](https://www.ibm.com/docs/en/instana-observability/current?topic=agents-setting-up-agent-repositories-dynamic-host).
-  Currently, the mirror must be a Nexus repository. This is probably the best
+  Currently, the mirror must be either a Nexus or artifactory repository. This is probably the best
   option for must customers because it allows them the benefits of automatic
   updates, while at the same time controlling the content that is in the
   repository.
@@ -77,6 +77,8 @@ ssh root@middleware
 ```
 
 When prompted, type **Passw0rd** for the root password.
+
+Note:  The commands used in this section will be executed as the root user.  But, Instana supports the use of sudo to execute the commands.
 
 Assuming you haven't clicked on anything, your Firefox browser should be showing the welcome screen.
 ![](images/welcome.png)
@@ -253,7 +255,7 @@ In the Instana GUI, click on **Agent deployment**
 
 :::tip
 
-If you aren't on the **Installing Instana Agents** screen you can get there by
+If you aren't on the screen you can get there by
 selecting the **"Home"** icon in the upper left corner and then clicking
 the **"Deploy Agent"** button near the upper right corner.
 
@@ -317,11 +319,6 @@ This completes the installation of Instana agent on Kubernetes cluster.
 
 ## 4.5: View Instana Agents in the Instana UI
 
-
-From the welcome page, click the **Go to Instana!** button
-![](images/goToInstana.png)
-
-
 From the **Installing Instana Agents** screen, select the **Go to Instana!**
 button. If you don't see the button you can move on to the next step.
 
@@ -358,12 +355,27 @@ You can click on the blue links with the cluster names to drill into the cluster
 
 ![](images/clusters.png)
 
+---
+
 ## 4.6: Troubleshooting Instana Agent Installation on Linux
 
 If you cannot see the **middleware** hosts in the Instana UI you
 should read the Instana agent logs on the respective agent host located at
 `/opt/instana/agent/data/log/agent.log`. Look for the current status and any
 warnings or errors that may be shown.
+
+In addition, search the agent.log file for the following string:  **Connected using HTTP/2**.  You'll see a log entry similar to what is shown below.
+This message indicates that the Agent has successfully conneted to the Instana backend server.
+
+![](images/connected.png)
+
+If you are using dynamic agents, another common problem is that the Agent is unable to connect to the external (or mirrored) repository in order to download sensors.  
+This will cause the Agent to fail.
+
+If none of the Agents are showing up in the Instana UI, double check to make sure that all pods are running on the Instana server. 
+Steps for checking the kubernetes pods can be found in section 3.5.
+
+---
 
 ## 4.7: Troubleshooting Instana Agent Installation on Kubernetes Cluster
 
@@ -372,7 +384,7 @@ minutes, you need to troubleshoot the Instana Agent that is running in kubernete
 
 :::caution Important
 
-The following must be done from a terminal window on each of the kubernetes cluster nodes (instana and k8control)
+The following must be done from a terminal window on each of the kubernetes cluster nodes (instana and k8control), depending on which kubernetes cluster is not working properly.
 
 :::
 
@@ -458,6 +470,19 @@ Instana agent configuration file must be a proper YAML - if your changes are not
 applied, make sure that it's not a formatting error
 
 :::
+
+In a kubernetes environment, the configuration.yaml content is located in a configmap named **instana-agent**.  To edit the configuration, type the following command:
+
+```sh
+kubectl edit cm instana-edit -n instana-agent
+```
+
+Then, look for a section that begins with configuration.yaml.  
+You can add valid yaml from the sensor configuration options provided in the product documentation 
+or available in the configuration.yaml file on a traditional server.  But, you need to make sure that
+the yaml section is indented by 2 spaces from the configuration.yaml entry.  See the screen capture below.
+
+![](images/configMap.png)
 
 ---
 
