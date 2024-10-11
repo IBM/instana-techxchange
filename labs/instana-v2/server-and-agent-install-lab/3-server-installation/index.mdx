@@ -328,6 +328,27 @@ You can login to that URL with the username and password that you specified duri
 
 During the installation process, the license file was automatically downloaded and placed in the /root/.stanctl/license.json file.  It was also installed on the Instana server.
 
+
+With this older version of stanctl, there are intermittent issues with the license file getting applied properly.   
+So, let's verify that the license was applied properly.  Run the following command:
+
+```sh
+stanctl license info
+```
+
+If the license is installed correctly, you will see an output similar to what's shown below.
+If the license is not installed, no data will be returned.
+
+![license](images/license.png)
+
+If the license is not installed, run the following command to install the license:
+
+```sh
+stanctl license update
+```
+
+After updating the license, rerun the **stanctl license info** command to confirm that it is installed correctly.
+
 ---
 
 ## 3.5: Launch the Instana User interface
