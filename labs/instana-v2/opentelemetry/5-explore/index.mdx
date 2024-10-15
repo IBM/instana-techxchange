@@ -10,12 +10,23 @@ Now, once the Instana and OpenTelemetry Demo Application are in sync, you can st
 
 ## Instana native tracing
 
-In this section you will focus on exploring Instana's native tracing capabilities. Within the Instana UI, select Analytics. Then, add two Filter criteria as shown below.
+In this section you will focus on exploring Instana's native tracing capabilities. 
+
+:::note
+Please note, that we could explore the OpenTelemetry traces via the Application Perspective created earlier, but in this section, we want to show how to use "Analytics" within Instana
+:::
+
+Within the Instana UI, select Analytics. Then, add two Filter criteria as shown below.
 
 - Application name: your application name
 - Service name: frontend-proxy
 
 You'll need to specify an "AND" condition between the two filter parameters.
+
+:::info
+Please note, that you can change the time window in the top right corner of the Instana UI. For the purpose of the lab, let's use "one hour" view
+![explore4](images/explore-008.png)
+:::
 
 Click on the "router frontend egress" as shown on the below screen
 
@@ -30,12 +41,16 @@ Instana native traces tags are always represented as a well-formated table
 
 ![explore5](images/explore-005-fixed.png)
 
+:::note
+Worth to notice: filtered view shows 100% of the transaction traces that are going through the application. This is one of the key Instana's strengths - Instana will capture 100% of transactions.
+:::
+
 ## OpenTelemetry tracing
 
 Using Instana agent, you can also receive OpenTelemetry based traces. Let's find an example in your environment.
 Go to Instana UI/Analytics (1) and search for calls which meet these criteria: 
 
-- Application name: your application name (2)
+- Application name: your application name (for example: "My Demo Application") (2)
 - Service name: quoteservice (3)
 
 Click on the call link (4) to see the transaction details.
@@ -58,12 +73,12 @@ Instana Otel traces tags are always represented as a JSON-structured content
 ## Instana and OpenTelemetry combined traces
 
 One of the key capabilities within Instana is the ability to stitch together traces using Instana's proprietary tracing and OpenTelemetry traces into a single application trace.
-Without this unique capability, you would be "required" to instrument your entire application with OpenTelemetry.   This can be a significant challenge, 
-particularly when there are shared services.
+Without this unique capability, you would be "required" to instrument your entire application with OpenTelemetry. This can be a significant challenge, 
+particularly when there are shared services. That means, ALL of applications that use the shared service, would need to be converted to OTEL simultaneously (otherwise, there could be a gaps in the monitoring).
 
 Please follow the below instructions to find an example of such a transaction in your environment.
 
-Go to Instana UI/Analytics and search for the calls that are in your application perspective and endpoint name is /api/cart like presented below.
+Go to the UI and add "Filters" to filter an application and add an "AND" condition to filter an endpoint name /api/cart like presented below.
 Click on /api/cart to see the details of the call.
 
 ![explore1](images/explore-003-fixed.png)
