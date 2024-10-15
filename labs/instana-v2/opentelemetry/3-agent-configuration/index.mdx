@@ -4,9 +4,7 @@ description: Agent configuration
 sidebar_position: 3
 ---
 
-# Agent configuration
-
-The Instana agent can directly receive OpenTelemetry traces, metrics, and logs in OpenTelemetry format. Then, the Instana agent forwards the data to the Instana backend. 
+## Introduction
 
 In this section of the lab, you will complete the following configurations:
 
@@ -24,6 +22,11 @@ For this lab, we will focus on point 1 - we will be sending data to the Instana 
 :::note
 Sending Otel data through the Instana Agent can be useful for some implementations with more strict firewall rules
 :::
+
+# Agent configuration
+
+The Instana agent can directly receive OpenTelemetry traces, metrics, and logs in OpenTelemetry format. Then, the Instana agent forwards the data to the Instana backend. 
+
 
 ## Enabling the OpenTelemetry data ingestion
 
@@ -70,9 +73,15 @@ After the OpenTelemetry data ingestion is activated, the host agent activates a 
 You might noticed, that there are other values populated within the configuration.yaml - do not change these. The lines below the OpenTelemetry configuration are required for the next steps in the Labs!
 :::
 
-## Starting the Agent 
+:::warning
+Please remember that yaml files are very sensitive to spacing. Each line must be indented by 0, 2, 4, 6, spaces, etc. and must be indented with spaces and not tabs.
 
-Now, the configuration.yaml file is ready to be used. The next step is to start the Instana agent using the altered configuration. Please run below command:
+When you are finished with your editing, the sections should look exactly like the screen captures in the lab guide. Pay careful attention to the spacing on each line.
+:::
+
+## Installing an Agent 
+
+Now, the configuration.yaml file is ready to be used. The next step is to install the Instana agent using the altered configuration. Please run below command:
 
 ```bash
 vim instana-agent-docker.yaml
@@ -107,6 +116,10 @@ please note below options:
 - --env="INSTANA_AGENT_KEY=XXXX" \- this can vary, depending on your agent key,
 - --env="INSTANA_DOWNLOAD_KEY=XXXX" \ - this can vary, depending on your download key,
 - --env="INSTANA_AGENT_ZONE=otel-demo" - optional parameter, which will help to configure the proper zone in Instana
+
+:::warning
+Please note, that you have to update your Agent and Download Key values. Please confirm, if the values are the same as in the Instana UI -> Deploy Agent -> search for Docker
+:::
 
 Copy the command from the "instana-agent-docker.yaml" file and paste it into the terminal. After instana-agent image and container setup, you will similar screen as below
 

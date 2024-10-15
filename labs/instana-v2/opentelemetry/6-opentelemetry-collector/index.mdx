@@ -52,7 +52,7 @@ exit
 
 ## Instana backend - verification 
 
-After applying backend changes, please navigate to the Instana UI / Analytics / Logs - if the Logs section is visible, it means the Instana backend is ready to accept the OpenTelemetry log content. Please confirm your Instana instance with the below screenshot
+After applying backend changes, please navigate to the Instana UI and refresh the page (use button F5). After refreshing, please open Instana UI / Analytics / Logs - if the Logs section is visible, it means the Instana backend is ready to accept the OpenTelemetry log content. Please confirm your Instana instance with the below screenshot
 
 ![collector001](images/collector-002.png)
 
@@ -62,6 +62,20 @@ After applying backend changes, please navigate to the Instana UI / Analytics / 
 In this scenario, you will configure OpenTelemetry Collector to send OpenTelemetry data to Instana backend through the Instana agent. First, you need to make sure, the Instana agent is up and running on the "kmaster" host. 
 
 The agent was pre-installed into your Lab environment.
+
+:::note
+Please note, that the proper configuration.yaml configuration should look like the below
+```sh
+com.instana.plugin.opentelemetry:
+  grpc:
+    enabled: true
+  http:
+    enabled: true
+```
+
+In this section, the configuration was already done, so you don't have to change it.
+:::
+
 
 Open a new terminal window and login to the "kmaster" host using the below command:
 
@@ -110,9 +124,17 @@ Please note, that the Otel data can also be sent to directly to the Instana back
 :::
 
 Other elements of the configuration file (based on the Otel protocol):
-- receivers - which element is providing the data to the Otel model. There are many different receivers, depending on the file/data types,
-- processors - what are the steps required before sending Otel data, for example data cleaning, re-formatting, enriching, etc.
-- exporters - which system should receive the Otel data, in our case that's Instana backend 
+- receivers - which element is providing the data to the Otel model. There are many different receivers, depending on the file/data types. Receivers, indicate that there are MANY available receivers such as SNMP, prometheus, databases, and many more, but we will be focusing on collecting log data and will be using the filelog receiver
+
+- processors - allow you to process the data before the data is sent to the exporter, for example data cleaning, re-formatting, enriching, etc.
+
+- exporters - which system should receive the Otel data, in our case that's Instana backend. It is possible to send data to multiple exporters
+
+Other interesting settings within the configuration file:
+- Setting the severity to "Fatal" if we find *FATAL* in the log
+- Instana's Agent is listing for GRPC data on port 4317, so we are configuring our exporter to send data to that port on localhost.
+- The "include" section at the top indicates which file(s) to monitor. In our case - example.log
+
 
 The file is ready to be used by the OpenTelemetry collector, let's close the configuration file:
 
