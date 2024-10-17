@@ -9,7 +9,7 @@ sidebar_position: 40
 In the real world, you can setup REST API Synthetic tests to monitor your application's availability via interval-defined scheduling to interrogate the applications' REST APIs. This would not only test the API function availability but also the response times by the REST API.
 In this lab exercise we will create synthetic tests that proactively tests the REST APIs to the Instana backend server. We will first create Simple REST API test, then followed by a Scripted REST API test.
 
-### Simple REST API test
+### 4.1 Simple REST API test
 Let's begin by executing a simple REST API test.  This will be a single REST GET request.
 
 Begin by selecting **Synthetics** and then **+ ADD** as seen below.
@@ -66,7 +66,7 @@ The example we will be using will actually be executing against the Instana serv
 
 
 
-### Creating an API token
+### 4.2 Creating an API token
 
 Since we will be using the Instana REST APIs to test the availability of Instana backend, we need an API token to request data from Instana server. 
 API Tokens are a part of authentication and authorization mechanism, that allows access to certain kinds of data. 
@@ -97,7 +97,7 @@ The API Token is now in your clipboard, but it probably makes sense to save it t
 
 
 
-### Creating a scripted REST API test
+### 4.3 Creating a scripted REST API test
 
 **Scripted REST API synthetic tests** may include several calls and different types GET/POST/PUT/DELETE in the same test. During the lab we will be doing two GET requests:
 - First, we will check if Instana backend as a target application returns success code of **200**
@@ -168,11 +168,11 @@ For the test we need the Instana token that we created on previous step.  If you
    - Switch to previous browser tab with Tokens: ![](images/TokenEye-new.png)
    - Click on eye on the right from the token and copy text.
    - Switch back to browser tab with script
-   - Paste Token as value for TOKEN variable (line 9 on screenshot above)
+   - Paste Token as value for TOKEN variable (line 8 on screenshot above)
 
-Instana will run the script from previously installed Synthetic Point of Presence, they can be placed at multiple locations across available infrastructure. The one we will use is deployed on the same cluster with Instana, it may have different name. Select it for our test.
+After you had input the correct API Token, then select the PoP that you had just installed in previous lab exercise.
    
-Click Next
+Click "Next" button.
 
 Adjust time slider to run test every minute:
 ![](images/TimeSlider-new.png)
@@ -180,23 +180,23 @@ Adjust time slider to run test every minute:
 and click "Next" button.
 
 
-Give the test meaningful name and description:
+Give the test a meaningful name and description:
 ![](images/CreateSynthTest-new.png)
 
 At the dialog under "Select an Application" you may specify the list of existing applications for which the test is relevant. The result of the test will appear at the "Synthetic Monitoring" tab of the Application dashboard and you will be able to filter tests by application on Synthetic Monitoring dashboard.
 
 Click "Create" button.
 
-It may take up to minute for Instana to perform the first test and show the line with results. You can refresh browser window and changing time duration for the dashboard on right top of the window to speed up the line to appear before the results of first test will be processed.
+It may take up to a few minutes for Instana to perform the first test and show the line with results. You can change the refresh time duration for the dashboard on top right of the window (e.g. click on LIVE) to show the test name or the results of the test as soon as they are are processed.
 
 By now you should see a list of tests:
 ![](images/ListOfTests-new.png)
 
-Click on the test name to access the dashboard of the synthetic test:
+Click on the test name **Instana REST API check** to access the dashboard of the synthetic test:
 
 ![](images/SyntheticTestDashboard-new.png)
 
-At the moment we have 4 agents reporting to the backend.  In the javascript, the assert parameter is checking whether there are more than 4 Hosts connected, so the check has passed. 
+At the moment we have 3 or 4 agents reporting to the backend.  In the javascript, the assert parameter is checking whether there are more than 4 Hosts connected, so the check has passed. 
 
 Next let's adjust threshold of the assert hostCount so that it fails if there are more than 1 host connected.
 
@@ -237,6 +237,19 @@ Error Message
 We have license to monitor 1 host and we have reached 4 already! 
 ```
 
-By now, you had learned how to create both a Simple REST API test and a Scripted REST API test in Instana's Synthetic Monitoring. Instana can also support more advanced API script, which you can refer to this URL for further information.
+:::info
+In the event that the javascript made multiple REST calls, the synthetic results page will also show each of the REST calls and their corresponding timings as well.
+In the following screenshot example from some other demo system (not part of this lab exercise), the Results page shows response timings for each of the REST calls:
+
+![](images/MultipleRESTcall.png)
+
+as well as the breakdown of the response timings.
+
+![](images/RESTtimingBreakdown.png)
+
+:::
+
+By now, you had learned how to create both a Simple REST API test and a Scripted REST API test in Instana's Synthetic Monitoring. 
+Instana can also support more advanced API script, which you can refer to this URL for further information.
 
 https://www.ibm.com/docs/en/instana-observability/current?topic=monitoring-using-api-scripts

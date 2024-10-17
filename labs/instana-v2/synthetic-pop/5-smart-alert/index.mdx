@@ -4,19 +4,20 @@ description: Welcome to the Synthetic Monitoring and Action Catalog lab
 sidebar_position: 60
 ---
 
-# Smart alert
+# Smart Alert for Synthetic Test
 
-## Create smart Alert for test
+## Creating Smart Alert for a synthetic test
 
-Smart Alerts allow you to identify a threshold violation.   Then, if desired, Alert people via external systems like Watson AIOps or Email, Slack, Service Now, etc. in Instana the notification mechanism is called an **Alert Channel** 
+In this lab, we will be creating Smart Alert to detect a problem with a synthetic test, and notify the team(s) of the problem via the **Alert Channel**. 
 
 Click "Synthetic Monitoring" -> "Add"
 ![](images/smartAlert-new.png)
 
-Then, select "ADD SYNTHETIC SMART ALERT":
+Then, select "Add Synthetic Smart Alert"
+
 ![](images/addSmartAlert.png)
 
-Click "Add Synthetic Test"
+In the **Create Smart Alert** wizard, click on "Add Synthetic Test"
 ![](images/selectSyntheticTest.png)
 
 Find the test you created earlier and select the **checkbox**.  Then, click **Add 1 Test**
@@ -28,7 +29,7 @@ Click **Next** to go to the next screen on the dialog.
 ![](images/SA_Step1-new.png)
 
 
-You may optionally add filters for monitored what is being monitored. In this case, we will not be adding any filters.  Simply click "Next".
+You may optionally add filters to define the scope of what is being monitored. In this case, we will not be adding any filters.  Simply click "Next".
 
 ![](images/optionalFilter-new.png)
 
@@ -37,32 +38,45 @@ We choose 1 consecutive occurrence to fire an alert, click Next:
 
 ![](images/SA_Step3-new.png)
 
-In the next step, we will be selecting an Alert Channel.  Alert Channels allow you to notify people and teams various **channels** such as email, slack, ServiceNow, etc.
+In the next step, we will be selecting an Alert Channel.  Alert Channels allow you to notify people and teams via various **channels** such as email, slack, ServiceNow, etc.
 
-Select "Select Alert Channels", "Create Alert Channel" to create new channel, then populate name of the channel and the list of email addresses (we will not send emails to real addresses, so just populate the field with any email address):
+Select "Select Alert Channels"
+
+![](images/SA_SelectAlertChannels.png)
+
+Then select "Create Alert Channel" to create a new alert channel.
+
+![](images/SA_CreateAlertChannel.png)
+
+Provide a name for the channel and the list of email addresses (we will not send emails in this lab, so just populate the field with any email address):
 
 ![](images/SA_Step4_CreateChannel-new.png)
 
-Then, click "Create Alert Channel", click "Cancel" to finish channel creation procedure.
+Then, click "Create Alert Channel" to finish channel creation procedure.
 
-Select created channel and click "Add 1 Channel":
+Select the newly created alert channel and click "Add 1 Channel":
 
 ![](images/SA_Step4_AddChannel-new.png)
 
-And click "Next":
+And then, click "Next":
 
 ![](images/SA_Step4_AlertChannels-new.png)
 
-Configure the alert that will be visible when the threshold violated. Set meaningful values for Title, Alert Level and Description, then click "Create" button:
+Next, we configure the alert that will be visible when the threshold is violated. Set meaningful values for Title, Alert Level and Description, then click "Create" button:
 
 ![](images/SA_Step5-new.png)
 
-Refresh page to have the alert appeared:
+Refresh the page to show the just configured alert to appear in the **Smart Alerts** tab.
 
 ![](images/ConfiguredAlert-new.png)
 
-Check Events appeared:
+After a few moments, you can click on **Event** to see the new event appearing.
 
 ![](images/Events-new.png)
 
-When new Events trigger on the synthetic test, an e-mail will be sent out via the **Alert Channel** notifying the people of the failure.
+When the new event alert triggered on the synthetic test failure, an e-mail will be sent out via the **Alert Channel** notifying the people of the failure.
+:::note
+Email will NOT be sent out in this lab due to networking limitation
+:::
+
+In summary, you have now setup a Smart Alert that will trigger when a synthetic test fails, and a notification will be send out via an email alert channel.
