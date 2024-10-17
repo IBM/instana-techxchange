@@ -6,11 +6,23 @@ sidebar_position: 80
 
 # Lab summary
 
-During the lab we:
-- Configured target monitored system (created Token to request parameters)
-- Created a simple synthetic test using a REST GET call.
-- Created a complex synthetic test that uses javascript to exercise multiple REST calls and perform an evaluation.
-- Created a simple synthetic test using Selenium IDE script.
-- Created Smart Alert for a synthetic test.
-- Created Action and run it from the context of Event.
-- Integrated with Ansible to test run some imported playbook actions.
+During the lab exercise, we:
+- Installed a Synthetic Point of Presence (PoP)
+- Created a simple synthetic test using a REST call.
+- Created a complex synthetic test with javascript to execute multiple REST calls and perform an evaluation.
+- Created a simple synthetic test using a pre-defined Selenium IDE script.
+- Created a Smart Alert for a synthetic test.
+- Created an Action and manually run it from the context of triggered Event.
+- Explored the Instana/Ansible integration and manually run some of integrated Ansible playbook actions.
+
+:::info
+In this lab, the following feature flags were enabled in the lab's Instana Standard Edition (self-hosted on-premise) backend server, using the following commands:
+
+stanctl backend apply --core-feature-flags feature.automation.enabled=true   
+stanctl backend apply --core-feature-flags feature.action.automation.enabled=true   
+stanctl backend apply --core-feature-flags feature.synthetics.enabled=true   
+stanctl backend apply --core-feature-flags feature.synthetic.browser.create.test.enabled=true   
+stanctl backend apply --core-feature-flags feature.synthetic.browser.script.enabled=true   
+stanctl backend apply --core-feature-flags feature.infra.smart.alerts.enabled=true   
+
+:::
