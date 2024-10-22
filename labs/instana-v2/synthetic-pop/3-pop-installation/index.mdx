@@ -67,12 +67,19 @@ helm install synthetic-pop \
 	synthetic-pop
   ```
 
+:::caution
+
+Do NOT copy and paste the helm chart from the lab guide.  You MUST get the helm command from the Instana server
+because it has information such as the instanaKey that ties it to your Instana server.
+
+:::
+
 For Synthetic Point of Presence we need to modify some of the parameters.  
 
 
-- Modify the **controller.clusterName** parameter and provide a meaningful name.
+- Modify the **controller.clusterName** parameter and provide a meaningful name.  
 - For the **controller.location**, specify a location name, display name, country, etc. for your "Point of Presence".   The "0;0" parameter represents the longitude and latitude of the "Point of Presence".
-These parameters help identify the Point of Presence when there are multiples deployed.
+These parameters help identify the Point of Presence when there are multiples deployed.  NOTE:   The controller location MUST have exactly 7 parameters that are separated by ";".
 - The **controller.instanaSyntheticEndpoint** is the Synthetic acceptor in the Instana backend server. Leave this value as it is.
 - Finally, enter a redis password.  This can be any value since you are setting the password. Minimum password length is 10
 
